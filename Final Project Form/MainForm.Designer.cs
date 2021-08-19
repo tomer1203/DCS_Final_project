@@ -301,7 +301,7 @@
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(515, 400);
             this.Name = "MainForm";
-            this.Text = "Terminal Project";
+            this.Text = "Final Project";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.mainForm_KeyDown);
             this.tabControl1.ResumeLayout(false);

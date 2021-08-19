@@ -137,7 +137,7 @@
             this.KeyPreview = true;
             this.Name = "ConfigurationsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Terminal Projet";
+            this.Text = "Final Project";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.saveConfButton_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
