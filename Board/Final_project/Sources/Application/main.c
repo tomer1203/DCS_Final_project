@@ -13,13 +13,13 @@ unsigned int LightIntensity = MUDULO_REGISTER/2;  // Global variable
 
 int main(void){
 	
-	char  s[100];
-	int i=0;
 	ClockSetup();
 	InitGPIO();
-	InitPIT();
+	InitTimers();
+	startTPM(0);
 	InitADCs();
 	InitUARTs();
+	
 	enablePIT();
 	disablePITx(1);
 	

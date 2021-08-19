@@ -4,7 +4,7 @@
  *  Created on: May 5, 2021
  *      Author: им
  */
-#include "Fsm.h"
+
 #include "TFC.h"
 void change_state(StateModes next_state){
 	state = next_state;
@@ -23,8 +23,6 @@ void Fsm(void){
 		switch (state){
 		
 		case IDLE_E:
-			disablePITx(0);
-			//RGB_LED_OFF;
 			wait(); 
 			break;
 		

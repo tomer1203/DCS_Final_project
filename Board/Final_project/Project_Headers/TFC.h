@@ -12,19 +12,25 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+
 #include "Derivative.h"
-#include "BoardSupport.h"
 #include "arm_cm0.h"
-#include "UART.h"
+
+#include "Application/Fsm.h"
+#include "Application/file_system.h"
+#include "Application/user_interface.h"
 
 
-#include "Fsm.h"
-#include "uart_functions.h"
-#include "file_system.h"
-#include "halGPIO.h"
-#include "user_interface.h"
-#include "ADCandDAC.h"
-#include "halLCD.h"
+#include "BoardSupport/BoardSupport.h"
+#include "BoardSupport/UART.h"
+#include "BoardSupport/Servo.h"
+#include "BoardSupport/ADCandDAC.h"
+
+
+#include "HardwareAbstraction/uart_functions.h"
+#include "HardwareAbstraction/halGPIO.h"
+#include "HardwareAbstraction/halLCD.h"
 
 
 #endif /* TFC_H_ */

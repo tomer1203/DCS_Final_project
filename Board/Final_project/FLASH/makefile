@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-#Progress monitor hint: 17
+#Progress monitor hint: 18
 first : all
 -include ../makefile.init
 
@@ -15,6 +15,9 @@ RM := "$(GNU_Make_Install_DirEnv)/rm" -rf
 -include sources.mk
 -include subdir.mk
 -include Sources/subdir.mk
+-include Sources/HardwareAbstraction/subdir.mk
+-include Sources/BoardSupport/subdir.mk
+-include Sources/Application/subdir.mk
 -include Project_Settings/Startup_Code/subdir.mk
 -include objects.mk
 
@@ -58,7 +61,7 @@ all: warning-messages explicit-dependencies Final_project.elf secondary-outputs
 # Tool invocations
 Final_project.elf: $(OBJS) $(USER_OBJS) ../Project_Settings/Linker_Files/MKL25Z128_flash.ld
 	@echo 'Building target: $@'
-	@echo 'Executing target #18 $@'
+	@echo 'Executing target #19 $@'
 	@echo 'Invoking: ARM Ltd Windows GCC C Linker'
 	"$(ARMSourceryDirEnv)/arm-none-eabi-gcc"  $(USER_OBJS_QUOTED) $(LIBS_QUOTED) @"Final_project.args" -o"Final_project.elf"
 	@echo 'Finished building target: $@'
