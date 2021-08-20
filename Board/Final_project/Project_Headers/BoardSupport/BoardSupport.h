@@ -87,4 +87,6 @@ void disablePITx(int x);
 void disableADC0();
 void enableADC0();
 
+void startTPMx(char x);
+
 #endif /* BOARDSUPPORT_H_ */

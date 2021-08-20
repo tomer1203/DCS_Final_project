@@ -8,6 +8,9 @@
 #ifndef SERVO_H_
 #define SERVO_H_
 
+void InitServo();
+void WriteServo(int deg);
+void sweepServo();
 
 
 #endif /* SERVO_H_ */

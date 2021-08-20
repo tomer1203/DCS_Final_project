@@ -1,7 +1,7 @@
 #include "TFC.h"
 #include "mcg.h"
 
-#define MUDULO_REGISTER  0x2EE0
+#define MUDULO_REGISTER  0xEA60 // 60,000
 
 // set I/O for switches and LEDs
 void InitGPIO() {
@@ -46,6 +46,7 @@ void InitGPIO() {
 	lcd_init(); // init the LCD
 	
 	/////// Servo /////////////////
+	GPIOD_PDDR |= PORT_LOC(4);  // PTD4 is output
 	PORTD_PCR4 = PORT_PCR_MUX(4); // TPM0_CH1- ALT4
 }
 
@@ -74,19 +75,22 @@ void ClockSetup() {
 //-----------------------------------------------------------------
 void InitTPM(char x){  // x={0,1,2}
 	switch(x){
-	case 0:
+	case 0: // Init TPM 0 Channel 4 for PTD4 (? FTM0_CH4 ?) page 567  
 		TPM0_SC = 0; // to ensure that the counter is not running
-		TPM0_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
-		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
-		TPM0_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM0_C1V = 0xFFFF;
+		TPM0_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler = 8, up-mode, counter-disable
+		// TPM period = (MOD + 1) * CounterClock_period
+		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 50Hz = 24MHz/(8x60,000)
+		TPM0_C4SC = 0;
+		// Edge Aligned , High-True pulse, channel interrupts enabled
+		TPM0_C4SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
+		TPM0_C4V = 0x0CCD; // Duty Cycle 5% - servo deg = 0
 		TPM0_CONF = 0; 
 		break;
 	case 1:
 		break;
 	case 2: 
 		TPM2_SC = 0; // to ensure that the counter is not running
-		TPM2_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
+		TPM2_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler = 8, up-mode, counter-disable
 		TPM2_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
 		TPM2_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
 		TPM2_C0V = 0xFFFF; 
@@ -95,6 +99,50 @@ void InitTPM(char x){  // x={0,1,2}
 		TPM2_CONF = 0;
 		break;
 	}
+}
+
+//-----------------------------------------------------------------
+// TPMx - Set Duty Cycle
+//-----------------------------------------------------------------
+void SetTPMxDutyCycle(char x, int dutyCycle){
+	
+	switch(x){
+	case 0:
+		TPM0_C4V |= dutyCycle; 
+		break;
+	case 1:
+		TPM1_C1V |= dutyCycle; 
+		break;
+	case 2:
+		TPM2_C1V |= dutyCycle; 
+		break;
+	}
+}
+//-----------------------------------------------------------------
+// Start TPMx
+//-----------------------------------------------------------------
+void startTPMx(char x, int start){
+	switch(x){
+	case 0:
+		if(start)
+			TPM0_SC |= TPM_SC_CMOD(1); //Start the TPM0 counter
+		else
+			TPM0_SC |= TPM_SC_CMOD(0); //Stop the TPM0 counter
+		break;
+	case 1:
+		if(start)
+			TPM1_SC |= TPM_SC_CMOD(1); //Start the TPM1 counter
+		else 
+			TPM1_SC |= TPM_SC_CMOD(0); //Stop the TPM1 counter
+		break;
+	case 2:
+		if(start)
+			TPM2_SC |= TPM_SC_CMOD(1); //Start the TPM2 counter
+		else
+			TPM2_SC |= TPM_SC_CMOD(0); //Stop the TPM2 counter
+		break;
+	}
+	
 }
 //-----------------------------------------------------------------
 // TPMx - Clock Setup
@@ -116,21 +164,6 @@ void ClockSetupTPM(){
 	    
 }
 
-void startTPM(char x){
-	switch(x){
-	case 0:
-		TPM0_SC |= TPM_SC_CMOD(1); //Start the TPM0 counter
-		break;
-	case 1:
-		TPM1_SC |= TPM_SC_CMOD(1); //Start the TPM1 counter
-		break;
-	case 2:
-		TPM2_SC |= TPM_SC_CMOD(1); //Start the TPM2 counter
-		break;
-	}
-	
-	
-}
 //-----------------------------------------------------------------
 // PIT - Initialisation
 //-----------------------------------------------------------------
@@ -158,14 +191,14 @@ void setPITInterval(unsigned int interval) {
 }
 
 /*
- * Enable PIT
+ * Enable PIT Module
  */
 void enablePIT() {
 	PIT_MCR &= ~PIT_MCR_MDIS_MASK; // Enables the PIT module	
 }
 
 /*
- * Disable PIT
+ * Disable PIT Module
  */
 void disablePIT() {
 	PIT_MCR |= PIT_MCR_MDIS_MASK; // Disables the PIT module	
