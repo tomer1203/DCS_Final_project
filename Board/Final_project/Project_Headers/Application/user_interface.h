@@ -7,16 +7,34 @@
 
 #ifndef USER_INTERFACE_H_
 #define USER_INTERFACE_H_
-
-#define MAIN_MENU_SIZE 4
-#define CHAT_MENU_SIZE 6
-#define FILE_MENU_SIZE 3
+#define MAX_SUBMENUS  20
+#define MAX_TITLE      17
 #define CONFIGURATION_MENU_SIZE 2
 
-int menu_select;
-int line_select;
-int menu_size;
+typedef struct Menu{
+	char       title[MAX_TITLE];
+	StateModes  menu_state;
+	StateModes (*enter_callback)();
+	void	   (*scroll_down_callback)();
+	void       (*print_callback)();
+	void       (*initialize_menu)();
+	short num_submenus;
+	struct Menu *submenu[MAX_SUBMENUS];
+}Menu;
+Menu menu;
 
+extern Menu radar_detection_menu;
+extern Menu telemeter_menu;
+extern Menu script_menu;
+extern Menu configuration_menu;
+extern Menu back_menu;
+extern Menu baud_menu;
+extern Menu main_menu;
+
+
+
+
+int line_select;
 int file_select;
 int last_file_select;
 
@@ -30,8 +48,5 @@ File_descriptor *current_file_desc;
 void print_ui();
 void scroll_down();
 StateModes enter();
-
-extern const char chat_lines[5][20];
-extern char main_menu[4][6][20];
 
 #endif /* USER_INTERFACE_H_ */
