@@ -15,6 +15,13 @@ char string_buffer[MAX_STRING];
 int string_index;
 int input_string_length;
 int baud_config;
+char DataReadyDis;
+
+float distance;
+volatile float captureR;		  //Input capture - rising
+volatile float captureF;		  //Input capture - falling
+volatile unsigned int captureFlag;	  //Input capture - Flag
+
 
 void DelayUs(unsigned int cnt);
 void DelayMs(unsigned int cnt);

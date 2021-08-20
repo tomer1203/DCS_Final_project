@@ -210,6 +210,37 @@ void ADC0_IRQHandler(){
 }
 
 
+//-----------------------------------------------------------------
+//  FTM2 - ISR = Interrupt Service Routine - Echo
+//-----------------------------------------------------------------
+void FTM2_IRQHandler(){
+	if (captureFlag ==0){
+		captureR = TPM2_C0V;    // Time of rising edge in Echo pulse
+		captureFlag = 1;
+	}
+	else{
+		captureF = TPM2_C0V;   // Time of falling edge in Echo pulse
+		captureFlag = 0;
+		distance = (captureF - captureR)/43.3;  //Calculate distance from sensor (in room temp)
+		DataReadyDis = 1;
+		TPM2_SC |= TPM_SC_CMOD(0);  // Stop the TPM2 counter
+		TPM2_CNT = 1;
+	}
+	//TPM2_SC |= TPM_SC_TOF_MASK;
+	TPM2_C0SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
+}
+
+//-----------------------------------------------------------------
+//  FTM0 - ISR = Interrupt Service Routine - Trigger
+//-----------------------------------------------------------------
+void FTM0_IRQHandler(){
+	//TPM0_SC |= TPM_SC_TOF_MASK;
+	TPM0_C1SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
+	TPM2_SC |= TPM_SC_CMOD(1);  // Start the TPM2 counter
+}
+
+
+
 /*
  * Initialises Timers
  */

@@ -47,6 +47,11 @@ void InitGPIO() {
 	
 	/////// Servo /////////////////
 	PORTD_PCR4 = PORT_PCR_MUX(4); // TPM0_CH1- ALT4
+	
+	////// Ultra-sonic Sensor /////
+    PORTC_PCR2 = PORT_PCR_MUX(4); // assign PTC2 as TPM0_CH1
+    PORTB_PCR2 = PORT_PCR_MUX(3); // assign PTB2 as TPM2_CH0
+	
 }
 
 //-----------------------------------------------------------------
@@ -73,28 +78,55 @@ void ClockSetup() {
 // TPMx - Initialization
 //-----------------------------------------------------------------
 void InitTPM(char x){  // x={0,1,2}
-	switch(x){
-	case 0:
+//	switch(x){
+//	case 0:
+//		TPM0_SC = 0; // to ensure that the counter is not running
+//		TPM0_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
+//		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
+//		TPM0_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
+//		TPM0_C1V = 0xFFFF;
+//		TPM0_CONF = 0; 
+//		break;
+//	case 1:
+//		break;
+//	case 2: 
+//		TPM2_SC = 0; // to ensure that the counter is not running
+//		TPM2_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
+//		TPM2_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
+//		TPM2_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
+//		TPM2_C0V = 0xFFFF; 
+//		TPM2_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
+//		TPM2_C1V = 0xFFFF;
+//		TPM2_CONF = 0;
+//		break;
+//	}
+	//TPM0 Channel1 - Trigger - PTC2
 		TPM0_SC = 0; // to ensure that the counter is not running
-		TPM0_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
-		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
-		TPM0_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM0_C1V = 0xFFFF;
-		TPM0_CONF = 0; 
-		break;
-	case 1:
-		break;
-	case 2: 
+		TPM0_SC |= TPM_SC_PS(7);//+ TPM_SC_TOIE_MASK; //Prescaler =128, enable TOF (overflowed by MOD) interrupts
+		TPM0_MOD = 0x2DC7; // PWM frequency of 16Hz = 24MHz/(128x11,719)
+		TPM0_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;//+ TPM_CnSC_CHF_MASK;; //Edge Aligned PWM
+		TPM0_C1V = 0x07; //High level of trigger to ultrasonic is 37microsec
+		TPM0_CONF |= TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
+		enable_irq(INT_TPM0-16); // Enable Interrupts 
+		set_irq_priority (INT_TPM0-16,0);  // Interrupt priority = 0 = max
+		
+		//TPM2 Channel0 - Echo - PTB2
 		TPM2_SC = 0; // to ensure that the counter is not running
-		TPM2_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler =128, up-mode, counter-disable
-		TPM2_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
-		TPM2_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM2_C0V = 0xFFFF; 
-		TPM2_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM2_C1V = 0xFFFF;
-		TPM2_CONF = 0;
-		break;
-	}
+		TPM2_SC |= TPM_SC_PS(5) + TPM_SC_TOF_MASK;  //Prescaler =32, clear flag
+		//24Mhz/32=0.75Mhz, T=1.333us*2^16=0.0873s= overflow time
+		TPM2_MOD = 0xFFFF; // value of overflow 
+		TPM2_C0SC |= TPM_CnSC_ELSB_MASK + TPM_CnSC_ELSA_MASK + TPM_CnSC_CHIE_MASK + TPM_CnSC_CHF_MASK;//input capture on both rising and falling
+		TPM2_CONF |= TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
+		enable_irq(INT_TPM2-16); // Enable Interrupts 
+		set_irq_priority (INT_TPM2-16,0);  // Interrupt priority = 0 = max
+		
+		/////
+		DataReadyDis = 0;
+
+		captureR = 0;		  //Input capture - rising
+		captureF =0;		  //Input capture - falling
+		captureFlag =0;
+		
 }
 //-----------------------------------------------------------------
 // TPMx - Clock Setup

@@ -17,15 +17,26 @@ void Fsm(void){
 	state = IDLE_E;
 	lastState = state;
 	interval = 0;
+	char distance_ascii[20];
 	
 	while(1){
 		
 		switch (state){
 		
 		case IDLE_E:
-			wait(); 
+			//wait(); 
+			if (DataReadyDis)
+			{
+				DataReadyDis = 0;
+				ftoa(distance,distance_ascii,2);
+				Print(distance_ascii);
+
+//				UARTprintf(UART0_BASE_PTR,disString);
+//				UARTprintf(UART0_BASE_PTR,"\r\n");
+
+			}
 			break;
-		
+			
 		}
 	}
 	
