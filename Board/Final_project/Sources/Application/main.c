@@ -16,7 +16,7 @@ int main(void){
 	ClockSetup();
 	InitGPIO();
 	InitTimers();
-	startTPM(0);
+	startTPMx(0,1);
 	InitADCs();
 	InitUARTs();
 	
@@ -26,7 +26,7 @@ int main(void){
 	initialize_ui();
 	initialize_file_system();
 	print_ui();
-	
+	WriteServo(180);
 	Fsm();
 	return 0;
 	

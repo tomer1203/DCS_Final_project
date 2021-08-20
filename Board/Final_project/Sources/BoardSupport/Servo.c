@@ -38,6 +38,6 @@ void sweepServo(){
 	// TODO: work with PIT
 	
 	int deg;
-	for(deg=0 ; deg < 180 ; i++)
+	for(deg=0 ; deg < 180 ; deg++)
 		WriteServo(deg);
 }
