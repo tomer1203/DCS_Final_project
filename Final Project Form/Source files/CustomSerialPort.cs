@@ -14,8 +14,8 @@ namespace TerminalProject.Source_files
     public class CustomSerialPort : SerialPort
     {
         // Our Format
-        public const string customFormat = "$[{0}]{1}|{2}|{3}";
-        public const int customFormatLength = 11; 
+        public const string CUSTOM_FORMAT = "$[{0}]{1}|{2}|{3}";
+        public const int CUSTOM_FORMAT_LENGTH = 11; 
         public const int PACKET_SIZE = 128;
         public const int SEND_DELAY = 50;
         public const int CONFIGURE_DELAY = 80;
@@ -34,6 +34,10 @@ namespace TerminalProject.Source_files
             public const string FILE_SIZE  = "Sz";
             public const string FILE_DATA  = "Wd";
             public const string FILE_END   = "Fe";
+            // Servo
+            public const string SERVO_DEG = "Sd";
+            public const string TELMETERIA = "Te";
+            public const string SCAN = "Sc";
         }
 
         // STATUS TYPE
@@ -111,10 +115,10 @@ namespace TerminalProject.Source_files
             this.DiscardInBuffer();
             string num = val.Length.ToString("D3");
             char checksum = '1';
-            String message = String.Format(customFormat, opc, checksum, num ,val);
+            String message = String.Format(CUSTOM_FORMAT, opc, checksum, num ,val);
             // Calc Checksum
             checksum = setCheckSum(message);
-            message = String.Format(customFormat, opc, checksum, num, val);
+            message = String.Format(CUSTOM_FORMAT, opc, checksum, num, val);
 
             // Send
             this.Write(message);
@@ -149,12 +153,12 @@ namespace TerminalProject.Source_files
                     return (Type.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
                 }
                 // Check if data len ok
-                if (dataLen == myBuffer.Length - customFormatLength)
+                if (dataLen == myBuffer.Length - CUSTOM_FORMAT_LENGTH)
                 {
                     lastMessage = myBuffer;
                 }
                 // Buffer Length Error
-                else if(dataLen < myBuffer.Length - customFormatLength)
+                else if(dataLen < myBuffer.Length - CUSTOM_FORMAT_LENGTH)
                 {
                     // get ready for next transaction
                     myBuffer = "";
@@ -165,7 +169,7 @@ namespace TerminalProject.Source_files
                 else { return (Type.STATUS, STATUS.RECIEVING_MESSAGE.ToString(), -1); }
 
             } // Error receiving data
-            else if (myBuffer.Length > customFormatLength)
+            else if (myBuffer.Length > CUSTOM_FORMAT_LENGTH)
             {
                 // get ready for next transaction
                 myBuffer = "";
@@ -181,7 +185,7 @@ namespace TerminalProject.Source_files
             int checksumStatus = validateChecksum(myBuffer, recievedCheckSum) ? STATUS.OK : STATUS.CHECKSUM_ERROR;
             string val = "0";
             if (checksumStatus == STATUS.OK)
-                val = myBuffer.Substring(customFormatLength);
+                val = myBuffer.Substring(CUSTOM_FORMAT_LENGTH);
 
             // get ready for next transaction
             myBuffer = "";

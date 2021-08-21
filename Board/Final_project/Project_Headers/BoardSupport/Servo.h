@@ -10,7 +10,7 @@
 
 void InitServo();
 void WriteServo(int deg);
-void sweepServo();
+void SweepServo();
 
 
 #endif /* SERVO_H_ */

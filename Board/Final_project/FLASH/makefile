@@ -54,6 +54,15 @@ EXECUTABLES_QUOTED += \
 EXECUTABLES_OS_FORMAT += \
 Final_project.elf \
 
+SECONDARY_SIZE += \
+Final_project.siz \
+
+SECONDARY_SIZE_QUOTED += \
+"Final_project.siz" \
+
+SECONDARY_SIZE_OS_FORMAT += \
+Final_project.siz \
+
 
 # All Target
 all: warning-messages explicit-dependencies Final_project.elf secondary-outputs
@@ -67,19 +76,26 @@ Final_project.elf: $(OBJS) $(USER_OBJS) ../Project_Settings/Linker_Files/MKL25Z1
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+Final_project.siz: Final_project.elf
+	@echo 'Executing target #20 $@'
+	@echo 'Invoking: ARM Ltd Windows GNU Print Size'
+	"$(ARMSourceryDirEnv)/arm-none-eabi-size"  --format=berkeley Final_project.elf
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) $(S_DEPS_QUOTED) "./*/*/*.o" "./*/*.o"  $(S_UPPER_DEPS_QUOTED) $(ASM_DEPS_QUOTED) $(ASM_UPPER_DEPS_QUOTED) $(SX_DEPS_QUOTED) $(EXECUTABLES_QUOTED) "./*/*/*.d" "./*/*.d"  $(ProjDirPath)/FLASH/Final_project.elf
+	-$(RM) $(S_DEPS_QUOTED) "./*/*/*.o" "./*/*.o"  $(S_UPPER_DEPS_QUOTED) $(ASM_DEPS_QUOTED) $(SECONDARY_SIZE_QUOTED) $(ASM_UPPER_DEPS_QUOTED) $(SX_DEPS_QUOTED) $(EXECUTABLES_QUOTED) "./*/*/*.d" "./*/*.d"  $(ProjDirPath)/FLASH/Final_project.elf
 	-@echo ' '
 
-secondary-outputs:
+secondary-outputs: $(SECONDARY_SIZE)
 
 .PHONY: all clean dependents explicit-dependencies warning-messages
 .SECONDARY:
 
 -include ../makefile.targets
 
-explicit-dependencies: ../Project_Settings/Linker_Files/MKL25Z128_flash.ld 
+explicit-dependencies: ../Project_Settings/Linker_Files/MKL25Z128_flash.ld Final_project.elf 
 
 warning-messages: 
 

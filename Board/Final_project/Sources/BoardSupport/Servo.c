@@ -26,18 +26,20 @@ void WriteServo(int deg){
 	if( SERVO_DEG_MAX < deg || deg < SERVO_DEG_MIN ){
 		return;
 	}
-	
+	startTPMx(SERVO_TPM, 0);
 	dutyCycle = TPM_DC_VAL_MIN *( deg / SERVO_DEG_MAX + 1);
 	SetTPMxDutyCycle(SERVO_TPM, dutyCycle);
+	startTPMx(SERVO_TPM, 1);
+	DelayMs(10);
 }
 
 //////////////////////////////////////
 //	Sweep Servo 180 deg back & forth
 //////////////////////////////////////
-void sweepServo(){
+void SweepServo(){
 	// TODO: work with PIT
 	
 	int deg;
-	for(deg=0 ; deg < 180 ; i++)
+	for(deg=0 ; deg < 180 ; deg++)
 		WriteServo(deg);
 }

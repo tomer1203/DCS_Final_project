@@ -31,14 +31,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.sendButton = new System.Windows.Forms.Button();
-            this.dataToSendTextBox = new System.Windows.Forms.TextBox();
-            this.enterStringLabel = new System.Windows.Forms.Label();
+            this.telemetriaButton = new System.Windows.Forms.Button();
+            this.telemetriaDataTextBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.statusLabel = new System.Windows.Forms.Label();
-            this.dataRecievePanel = new System.Windows.Forms.Panel();
-            this.dataRecieveLabel = new System.Windows.Forms.Label();
+            this.radarPanel = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.angleLabel = new System.Windows.Forms.Label();
+            this.distanceLabel = new System.Windows.Forms.Label();
+            this.radarPictureBox = new System.Windows.Forms.PictureBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.fileStatusLabel = new System.Windows.Forms.Label();
             this.sendFileButton = new System.Windows.Forms.Button();
@@ -50,9 +52,12 @@
             this.connectingPictureBox = new System.Windows.Forms.PictureBox();
             this.configurationsLabel = new System.Windows.Forms.Label();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.scanButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.dataRecievePanel.SuspendLayout();
+            this.radarPanel.SuspendLayout();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.radarPictureBox)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.fileNamePanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -62,98 +67,119 @@
             // 
             // sendButton
             // 
-            this.sendButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.sendButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.sendButton.ForeColor = System.Drawing.Color.Teal;
-            this.sendButton.Location = new System.Drawing.Point(748, 45);
-            this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(61, 36);
-            this.sendButton.TabIndex = 0;
-            this.sendButton.Text = "Send";
-            this.sendButton.UseVisualStyleBackColor = true;
-            this.sendButton.Click += new System.EventHandler(this.sendMessageButton_Click);
+            this.telemetriaButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.telemetriaButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaButton.ForeColor = System.Drawing.Color.Teal;
+            this.telemetriaButton.Location = new System.Drawing.Point(807, 17);
+            this.telemetriaButton.Name = "sendButton";
+            this.telemetriaButton.Size = new System.Drawing.Size(61, 36);
+            this.telemetriaButton.TabIndex = 0;
+            this.telemetriaButton.Text = "Send";
+            this.telemetriaButton.UseVisualStyleBackColor = true;
+            this.telemetriaButton.Click += new System.EventHandler(this.telemetriaButton_Click);
             // 
             // dataToSendTextBox
             // 
-            this.dataToSendTextBox.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.dataToSendTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.dataToSendTextBox.Location = new System.Drawing.Point(39, 45);
-            this.dataToSendTextBox.Name = "dataToSendTextBox";
-            this.dataToSendTextBox.Size = new System.Drawing.Size(703, 30);
-            this.dataToSendTextBox.TabIndex = 0;
-            // 
-            // enterStringLabel
-            // 
-            this.enterStringLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.enterStringLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.enterStringLabel.Location = new System.Drawing.Point(35, 17);
-            this.enterStringLabel.Name = "enterStringLabel";
-            this.enterStringLabel.Size = new System.Drawing.Size(200, 25);
-            this.enterStringLabel.TabIndex = 0;
-            this.enterStringLabel.Text = "Enter String:";
+            this.telemetriaDataTextBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.telemetriaDataTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaDataTextBox.Location = new System.Drawing.Point(98, 17);
+            this.telemetriaDataTextBox.Name = "dataToSendTextBox";
+            this.telemetriaDataTextBox.Size = new System.Drawing.Size(703, 30);
+            this.telemetriaDataTextBox.TabIndex = 0;
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.tabControl1.ItemSize = new System.Drawing.Size(100, 35);
-            this.tabControl1.Location = new System.Drawing.Point(-3, 54);
+            this.tabControl1.Location = new System.Drawing.Point(0, 51);
             this.tabControl1.Name = "tabControl1";
-            this.tabControl1.Padding = new System.Drawing.Point(179, 2);
+            this.tabControl1.Padding = new System.Drawing.Point(196, 2);
+            this.tabControl1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(857, 500);
+            this.tabControl1.Size = new System.Drawing.Size(985, 593);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.statusLabel);
-            this.tabPage1.Controls.Add(this.dataRecievePanel);
-            this.tabPage1.Controls.Add(this.sendButton);
-            this.tabPage1.Controls.Add(this.enterStringLabel);
-            this.tabPage1.Controls.Add(this.dataToSendTextBox);
+            this.tabPage1.Controls.Add(this.radarPanel);
+            this.tabPage1.Controls.Add(this.telemetriaButton);
+            this.tabPage1.Controls.Add(this.telemetriaDataTextBox);
             this.tabPage1.Location = new System.Drawing.Point(4, 39);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(849, 457);
+            this.tabPage1.Size = new System.Drawing.Size(977, 550);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Chat";
+            this.tabPage1.Text = "Radar Detector";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // statusLabel
             // 
             this.statusLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.statusLabel.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.statusLabel.Location = new System.Drawing.Point(3, 434);
+            this.statusLabel.Location = new System.Drawing.Point(3, 527);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(843, 20);
+            this.statusLabel.Size = new System.Drawing.Size(971, 20);
             this.statusLabel.TabIndex = 4;
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // dataRecievePanel
+            // radarPanel
             // 
-            this.dataRecievePanel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.dataRecievePanel.Controls.Add(this.dataRecieveLabel);
-            this.dataRecievePanel.Location = new System.Drawing.Point(35, 98);
-            this.dataRecievePanel.Name = "dataRecievePanel";
-            this.dataRecievePanel.Size = new System.Drawing.Size(770, 218);
-            this.dataRecievePanel.TabIndex = 2;
+            this.radarPanel.BackColor = System.Drawing.Color.Black;
+            this.radarPanel.Controls.Add(this.scanButton);
+            this.radarPanel.Controls.Add(this.panel2);
+            this.radarPanel.Controls.Add(this.radarPictureBox);
+            this.radarPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radarPanel.Location = new System.Drawing.Point(3, 3);
+            this.radarPanel.Name = "radarPanel";
+            this.radarPanel.Size = new System.Drawing.Size(971, 544);
+            this.radarPanel.TabIndex = 2;
             // 
-            // dataRecieveLabel
+            // panel2
             // 
-            this.dataRecieveLabel.BackColor = System.Drawing.SystemColors.MenuBar;
-            this.dataRecieveLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataRecieveLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.dataRecieveLabel.Location = new System.Drawing.Point(0, 0);
-            this.dataRecieveLabel.Name = "dataRecieveLabel";
-            this.dataRecieveLabel.Size = new System.Drawing.Size(770, 218);
-            this.dataRecieveLabel.TabIndex = 0;
-            this.dataRecieveLabel.Text = "String Recieved";
-            this.dataRecieveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.panel2.BackColor = System.Drawing.Color.Black;
+            this.panel2.Controls.Add(this.angleLabel);
+            this.panel2.Controls.Add(this.distanceLabel);
+            this.panel2.Location = new System.Drawing.Point(791, 14);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(163, 77);
+            this.panel2.TabIndex = 1;
+            // 
+            // angleLabel
+            // 
+            this.angleLabel.AutoSize = true;
+            this.angleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.angleLabel.ForeColor = System.Drawing.Color.Green;
+            this.angleLabel.Location = new System.Drawing.Point(3, 46);
+            this.angleLabel.Name = "angleLabel";
+            this.angleLabel.Size = new System.Drawing.Size(60, 20);
+            this.angleLabel.TabIndex = 1;
+            this.angleLabel.Text = "Angle:";
+            // 
+            // distanceLabel
+            // 
+            this.distanceLabel.AutoSize = true;
+            this.distanceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.distanceLabel.ForeColor = System.Drawing.Color.Green;
+            this.distanceLabel.Location = new System.Drawing.Point(3, 11);
+            this.distanceLabel.Name = "distanceLabel";
+            this.distanceLabel.Size = new System.Drawing.Size(85, 20);
+            this.distanceLabel.TabIndex = 0;
+            this.distanceLabel.Text = "Distance:";
+            // 
+            // radarPictureBox
+            // 
+            this.radarPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radarPictureBox.Location = new System.Drawing.Point(0, 0);
+            this.radarPictureBox.Name = "radarPictureBox";
+            this.radarPictureBox.Size = new System.Drawing.Size(971, 544);
+            this.radarPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.radarPictureBox.TabIndex = 0;
+            this.radarPictureBox.TabStop = false;
             // 
             // tabPage2
             // 
@@ -164,7 +190,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 39);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(849, 457);
+            this.tabPage2.Size = new System.Drawing.Size(977, 550);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "File Transfer";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -173,9 +199,9 @@
             // 
             this.fileStatusLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.fileStatusLabel.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.fileStatusLabel.Location = new System.Drawing.Point(3, 434);
+            this.fileStatusLabel.Location = new System.Drawing.Point(3, 527);
             this.fileStatusLabel.Name = "fileStatusLabel";
-            this.fileStatusLabel.Size = new System.Drawing.Size(843, 20);
+            this.fileStatusLabel.Size = new System.Drawing.Size(971, 20);
             this.fileStatusLabel.TabIndex = 5;
             this.fileStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -183,7 +209,7 @@
             // 
             this.sendFileButton.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.sendFileButton.ForeColor = System.Drawing.Color.Teal;
-            this.sendFileButton.Location = new System.Drawing.Point(391, 370);
+            this.sendFileButton.Location = new System.Drawing.Point(385, 366);
             this.sendFileButton.Name = "sendFileButton";
             this.sendFileButton.Size = new System.Drawing.Size(75, 27);
             this.sendFileButton.TabIndex = 2;
@@ -198,7 +224,7 @@
             this.filesListView.FullRowSelect = true;
             this.filesListView.GridLines = true;
             this.filesListView.HideSelection = false;
-            this.filesListView.Location = new System.Drawing.Point(33, 90);
+            this.filesListView.Location = new System.Drawing.Point(27, 86);
             this.filesListView.MultiSelect = false;
             this.filesListView.Name = "filesListView";
             this.filesListView.Scrollable = false;
@@ -213,7 +239,7 @@
             // 
             this.fileNamePanel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.fileNamePanel.Controls.Add(this.fileNameLabel);
-            this.fileNamePanel.Location = new System.Drawing.Point(28, 20);
+            this.fileNamePanel.Location = new System.Drawing.Point(22, 16);
             this.fileNamePanel.Name = "fileNamePanel";
             this.fileNamePanel.Size = new System.Drawing.Size(782, 64);
             this.fileNamePanel.TabIndex = 0;
@@ -235,7 +261,7 @@
             this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.Controls.Add(this.connectingLabel);
             this.panel1.Controls.Add(this.connectingPictureBox);
-            this.panel1.Location = new System.Drawing.Point(12, 6);
+            this.panel1.Location = new System.Drawing.Point(59, 11);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(826, 37);
             this.panel1.TabIndex = 2;
@@ -266,7 +292,7 @@
             this.configurationsLabel.BackColor = System.Drawing.Color.Transparent;
             this.configurationsLabel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.configurationsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.configurationsLabel.Location = new System.Drawing.Point(11, 8);
+            this.configurationsLabel.Location = new System.Drawing.Point(10, 7);
             this.configurationsLabel.Name = "configurationsLabel";
             this.configurationsLabel.Size = new System.Drawing.Size(63, 29);
             this.configurationsLabel.TabIndex = 3;
@@ -281,19 +307,32 @@
             this.settingsPanel.BackColor = System.Drawing.Color.Transparent;
             this.settingsPanel.Controls.Add(this.configurationsLabel);
             this.settingsPanel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.settingsPanel.Location = new System.Drawing.Point(1, 6);
+            this.settingsPanel.Location = new System.Drawing.Point(12, 12);
             this.settingsPanel.Name = "settingsPanel";
             this.settingsPanel.Size = new System.Drawing.Size(76, 37);
             this.settingsPanel.TabIndex = 2;
             this.settingsPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
             this.settingsPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
+            // scanButton
+            // 
+            this.scanButton.BackColor = System.Drawing.Color.DimGray;
+            this.scanButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.scanButton.ForeColor = System.Drawing.Color.Black;
+            this.scanButton.Location = new System.Drawing.Point(19, 17);
+            this.scanButton.Name = "scanButton";
+            this.scanButton.Size = new System.Drawing.Size(81, 36);
+            this.scanButton.TabIndex = 2;
+            this.scanButton.Text = "Scan";
+            this.scanButton.UseVisualStyleBackColor = false;
+            this.scanButton.Click += new System.EventHandler(this.scanButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MediumTurquoise;
-            this.ClientSize = new System.Drawing.Size(841, 551);
+            this.ClientSize = new System.Drawing.Size(985, 644);
             this.Controls.Add(this.settingsPanel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.tabControl1);
@@ -307,7 +346,10 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.dataRecievePanel.ResumeLayout(false);
+            this.radarPanel.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.radarPictureBox)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.fileNamePanel.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
@@ -319,13 +361,10 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button sendButton;
+        private System.Windows.Forms.Button telemetriaButton;
 
         // Text Box
-        private System.Windows.Forms.TextBox dataToSendTextBox;
-
-        // Labels
-        private System.Windows.Forms.Label enterStringLabel;
+        private System.Windows.Forms.TextBox telemetriaDataTextBox;
         private System.Windows.Forms.Label connectingLabel;
 
         // Tabs
@@ -336,14 +375,18 @@
         private System.Windows.Forms.PictureBox connectingPictureBox;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel settingsPanel;
-        private System.Windows.Forms.Panel dataRecievePanel;
-        private System.Windows.Forms.Label dataRecieveLabel;
         private System.Windows.Forms.Panel fileNamePanel;
         private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.ListView filesListView;
         private System.Windows.Forms.Button sendFileButton;
         private System.Windows.Forms.Label fileStatusLabel;
+        private System.Windows.Forms.Panel radarPanel;
+        private System.Windows.Forms.PictureBox radarPictureBox;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label angleLabel;
+        private System.Windows.Forms.Label distanceLabel;
+        private System.Windows.Forms.Button scanButton;
     }
 }
 
