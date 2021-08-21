@@ -16,6 +16,13 @@ int string_index;
 int input_string_length;
 int baud_config;
 
+extern char distance_ready;
+extern float distance;
+extern volatile float rising_edge;
+extern volatile float falling_edge;
+extern volatile unsigned int signal_taken;	  
+
+
 void DelayUs(unsigned int cnt);
 void DelayMs(unsigned int cnt);
 void InitTimers();

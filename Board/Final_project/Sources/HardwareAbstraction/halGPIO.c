@@ -113,7 +113,7 @@ void handleMessage(){
 	}
 	
 	switch (state) {
-	
+	 
 	case WRITING_FILE_INIT_E:
 		function_return_value = write_file_init_message(string_buffer);
 		if (function_return_value == 1) {
@@ -180,11 +180,12 @@ void changeBaudrate(){
 	send2pc(TYPE.STATUS, STATUS.OK);
 	Print_two_lines("Baud Rate:", strip_command(string_buffer));
 	sprintf(baudRate, "%5d", baud_config);
-	main_menu[3][1][7] = baudRate[0];
-	main_menu[3][1][8] = baudRate[1];
-	main_menu[3][1][9] = baudRate[2];
-	main_menu[3][1][10] = baudRate[3];
-	main_menu[3][1][11] = baudRate[4];
+	
+	baud_menu.title[6] = baudRate[0];
+	baud_menu.title[7] = baudRate[1];
+	baud_menu.title[8] = baudRate[2];
+	baud_menu.title[9] = baudRate[3];
+	baud_menu.title[10] = baudRate[4];
 }
 
 //-----------------------------------------------------------------
@@ -206,6 +207,31 @@ void ADC0_IRQHandler(){
 	//itoa( data ,data_string ,10);
 	//Print(data_string);
 	
+}
+
+// trigger
+void FTM0_IRQHandler(){
+	//TPM0_SC |= TPM_SC_TOF_MASK;
+	TPM0_C1SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
+	TPM2_SC |= TPM_SC_CMOD(1);  // Start the TPM2 counter
+}
+
+// echo
+void FTM2_IRQHandler(){
+	if (signal_taken ==0){
+		rising_edge = TPM2_C0V;    // Time of rising edge in Echo pulse
+		signal_taken = 1;
+	}
+	else{
+		falling_edge = TPM2_C0V;   // Time of falling edge in Echo pulse
+		signal_taken = 0;
+		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
+		distance_ready = 1;
+		TPM2_SC |= TPM_SC_CMOD(0);  // Stop the TPM2 counter
+		TPM2_CNT = 1;
+	}
+	//TPM2_SC |= TPM_SC_TOF_MASK;
+	TPM2_C0SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
 }
 
 
