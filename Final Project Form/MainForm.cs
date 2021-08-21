@@ -18,8 +18,14 @@ namespace TerminalProject
 {
     public partial class MainForm : Form
     {
+        // Console
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
 
+        // SerialPort
         private static CustomSerialPort serialPort;
+        // InData
         private ValueTuple<string, string, int> inData = new ValueTuple<string, string, int>();
 
         // For Files
@@ -29,9 +35,24 @@ namespace TerminalProject
         private string selectedFilePath = "";
         private string dataFilesPath = "";
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AllocConsole();
+        // Radar System
+        private bool scanMode = false;
+        System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+
+        int WIDTH, HEIGHT, HAND;
+
+        private int handDeg, handDegBlack;       // in degree
+        private int handX, handY;                // HAND coordinate
+        private int handBlackX, handBlackY;      // black hand
+        private const int LIM = 15, MAX_SERVO_ANGLE = 180;
+        private int circleX, circleY;            //center of the circle
+        private int handStartAngle = -90;
+
+        private bool left_to_right = true;
+        // radar drawing
+        private Bitmap bmp;
+        private Pen pen;
+        private Graphics graphics;
 
         /*
          * Construstor
@@ -43,9 +64,6 @@ namespace TerminalProject
             this.MaximumSize = this.Size;
 
             tabControl1.Width = this.Width;
-
-            this.dataRecieveLabel.Parent = this.dataRecievePanel;
-            this.dataRecieveLabel.Text = "";
 
             // Get Current Directory
             currentDirectoryPath = Environment.CurrentDirectory;
@@ -61,6 +79,7 @@ namespace TerminalProject
             }
             catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
 
+            // Event Hub Handlers
             EventHub.saveConfigurationsHandler += onSerialConfigurationsChanged;
             EventHub.fileSendingProgressHandler += onFileSendingProgress;
 
@@ -69,12 +88,131 @@ namespace TerminalProject
 
         } // END MainForm
 
-        private void Form1_Load(object sender, EventArgs e) { AllocConsole(); }
+        /*
+         *  Form1_Load
+         */ 
+        private void Form1_Load(object sender, EventArgs e) {
+            AllocConsole();
+
+            WIDTH = radarPanel.Height * 2;
+            HEIGHT = radarPanel.Height;
+            HAND = radarPanel.Height;
+
+            //create Bitmap
+            bmp = new Bitmap(WIDTH + 1, HEIGHT + 1);
+
+            //center
+            circleX = radarPanel.Width / 2  + 55;
+            circleY = radarPanel.Height;
+
+            //initial degree of HAND
+            handDeg = handStartAngle;
+
+            //timer
+            t.Interval = 50; //in millisecond
+            t.Tick += new EventHandler(this.t_Tick);
+        }
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////           Main Methods
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+       /*
+        * Tick Tock Radar 
+        */ 
+        private void t_Tick(object sender, EventArgs e)
+        {
+            //pen
+            pen = new Pen(Color.Green, 1f);
+
+            //graphics
+            graphics = Graphics.FromImage(bmp);
+
+            angleLabel.Text = "Angle: " + (handDeg + 90);
+
+            //calculate x, y coordinate of HAND
+            if(left_to_right)
+                handDegBlack = (handDeg - LIM);
+            else
+                handDegBlack = (handDeg + LIM);
+
+            // swipe hand back and forth
+            if (handDeg == 90)
+                left_to_right = false;
+            else if(handDeg == -90)
+                left_to_right = true;
+
+            if (handDeg >= 0 && handDeg <= MAX_SERVO_ANGLE)
+            {
+                // right half
+                // u in degree is converted into radian.
+
+                handX = circleX + (int)(HAND * Math.Sin(Math.PI * handDeg / 180));
+                handY = circleY - (int)(HAND * Math.Cos(Math.PI * handDeg / 180));
+            }
+            else
+            {
+                // left half
+                handX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDeg / 180));
+                handY = circleY - (int)(HAND * Math.Cos(Math.PI * handDeg / 180));
+            }
+
+            if (handDegBlack >= 0 && handDegBlack <= MAX_SERVO_ANGLE)
+            {
+                //right half
+                //tu in degree is converted into radian.
+
+                handBlackX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegBlack / 180));
+                handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
+            }
+            else
+            {
+                handBlackX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegBlack / 180));
+                handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
+            }
+            //////////////////////////////
+            //       Draw Radar 
+            /////////////////////////////
+            
+            // draw circles
+            for (int i = 50 ; i < HAND ; i += 100)
+            {
+                int radius = HAND - i;
+                graphics.DrawEllipse(pen, circleX - radius, circleY - radius, radius * 2, radius * 2);  
+            }
+
+            //draw perpendicular line
+            graphics.DrawLine(pen, new Point(circleX, 0), new Point(circleX, HEIGHT)); // UP-DOWN
+            // draw angled lines
+            for (int ang = 30; ang < MAX_SERVO_ANGLE; ang += 30)
+            {
+                Point p_end = new Point(circleX - (int)(HAND * Math.Cos(ang * Math.PI / 180)), circleY - (int)(HAND * Math.Sin(ang * Math.PI / 180)));
+                graphics.DrawLine(pen, new Point(circleX, HEIGHT), p_end);
+            }
+
+            //draw HAND
+            graphics.DrawLine(new Pen(Color.Black, 1f), new Point(circleX, circleY), new Point(handBlackX, handBlackY));
+            graphics.DrawLine(pen, new Point(circleX, circleY), new Point(handX, handY));
+
+            //load bitmap in picturebox1
+            radarPictureBox.Image = bmp;
+
+            //dispose
+            pen.Dispose();
+            graphics.Dispose();
+
+            //update
+            if(left_to_right)
+                handDeg++;
+            else
+                handDeg--;
+
+            if (handDeg == MAX_SERVO_ANGLE)
+            {
+                handDeg = handStartAngle;
+            }
+        } // ens tick-tock radar
 
         /*
          * Listens to UART interrupts
@@ -116,14 +254,14 @@ namespace TerminalProject
             if (checksumStatus == CustomSerialPort.STATUS.CHECKSUM_ERROR)
             {
                 updateChatStatusLabel(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.CHECKSUM_ERROR));
-                updateChatDataLabel("");
+                Console.WriteLine(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.CHECKSUM_ERROR));
                 return;
             }
             
             // Check opc
             switch (opc)
             {
-                // not in use
+                // Baud rate change acknoledge
                 case CustomSerialPort.Type.BAUDRATE:
                     try
                     {
@@ -140,10 +278,16 @@ namespace TerminalProject
                     catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                     break;
 
-                // Text Message Recieved
-                case CustomSerialPort.Type.TEXT:
-                    selectTab(0);
-                    updateChatDataLabel(val);
+                // Recieve scanner info
+                case CustomSerialPort.Type.SCAN:
+                    int deg = int.Parse(val.Substring(0, 3));
+                    float dist = float.Parse(val.Substring(3));
+                    Console.WriteLine("Telemeter: deg- " + deg + " dist- " + dist + " cm");
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        angleLabel.Text = deg.ToString();
+                        distanceLabel.Text = dist.ToString();
+                    });
                     break;
 
                 // Get MCU Serial Port Status
@@ -338,7 +482,7 @@ namespace TerminalProject
             if (keyEvent.KeyCode == Keys.Enter)
             {
                 if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage1"])
-                    sendMessageButton_Click(sender, new EventArgs());
+                    telemetriaButton_Click(sender, new EventArgs());
                 else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage2"])
                     sendFileButton_Click(sender, new EventArgs());
             }
@@ -393,7 +537,7 @@ namespace TerminalProject
             }
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                Chat Tab
+        //                Radar Tab
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -414,36 +558,18 @@ namespace TerminalProject
         }
 
         /*
-        * Update Chat Data Recieved Label
-        */
-        private void updateChatDataLabel(string dataRecievedLabelString)
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke((MethodInvoker)delegate
-                {
-                    dataRecieveLabel.Text = dataRecievedLabelString;
-                });
-            }
-            else
-                dataRecieveLabel.Text = dataRecievedLabelString;
-           
-        }
-
-
-        /*
          * On Send Message Button Click 
          */
-        private void sendMessageButton_Click(object sender, EventArgs e)
+        private void telemetriaButton_Click(object sender, EventArgs e)
         {
-            if (dataToSendTextBox.Text.Equals(""))
+            if (telemetriaDataTextBox.Text.Equals(""))
                 return;
 
             // Send Message to MCU
             try
             {   
-                serialPort.sendMessage(CustomSerialPort.Type.TEXT, dataToSendTextBox.Text);
-                dataToSendTextBox.Text = "";
+                serialPort.sendMessage(CustomSerialPort.Type.TEXT, telemetriaDataTextBox.Text);
+                telemetriaDataTextBox.Text = "";
             }
             catch (Exception)
             {
@@ -451,13 +577,36 @@ namespace TerminalProject
             }
         }
 
+        /*
+         * Scan Radar Button Click Listener
+         */ 
+         //  $[Te]_|---|
+        private void scanButton_Click(object sender, EventArgs e)
+        {
+            if (scanMode) // Stop scanning
+            {
+                scanMode = false;
+                scanButton.Text = "Stop";
+                t.Stop();
+
+            }
+            else // start scanning
+            {
+                scanMode = true;
+                scanButton.Text = "Scan";
+                t.Start();
+            }
+           
+
+        }
+
 
         /*
          * NFB Button click to send data using Write method
-         */ 
+         */
         private void nonFormatButon_Click(object sender, EventArgs e)
         {
-            serialPort.Write(dataToSendTextBox.Text);
+            serialPort.Write(telemetriaDataTextBox.Text);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////

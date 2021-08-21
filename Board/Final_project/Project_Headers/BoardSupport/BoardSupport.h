@@ -88,5 +88,4 @@ void disableADC0();
 void enableADC0();
 void startTPMx(char x, int start);
 
-
 #endif /* BOARDSUPPORT_H_ */

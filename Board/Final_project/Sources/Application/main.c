@@ -26,9 +26,15 @@ int main(void){
 	ClockSetup();
 	InitGPIO();
 	InitTimers();
-	startTPMx(0,1);
+
 	InitADCs();
 	InitUARTs();
+	
+	InitServo();
+	WriteServo(180);
+	
+	//while(1)
+		//SweepServo();
 	
 	enablePIT();
 	disablePITx(1);
