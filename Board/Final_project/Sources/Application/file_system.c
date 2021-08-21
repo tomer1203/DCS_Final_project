@@ -175,7 +175,7 @@ void read_commandline_init(int file_index){
 int read_commandline(char* new_line){
 	int i=0;
 	file_system.number_of_bytes_read+=1;
-	while (current_char != '\n'){
+	while (file_system.read_pointer != '\n'){
 		if (file_system.number_of_bytes_read >= file_system.file_list[file_system.read_file].size){
 			return 0;
 		}

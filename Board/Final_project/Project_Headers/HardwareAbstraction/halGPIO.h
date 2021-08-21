@@ -16,11 +16,11 @@ int string_index;
 int input_string_length;
 int baud_config;
 
-char distance_ready;
-float distance;
-volatile float rising_edge;
-volatile float falling_edge;
-volatile unsigned int signal_taken;	  
+extern char distance_ready;
+extern float distance;
+extern volatile float rising_edge;
+extern volatile float falling_edge;
+extern volatile unsigned int signal_taken;	  
 
 
 void DelayUs(unsigned int cnt);

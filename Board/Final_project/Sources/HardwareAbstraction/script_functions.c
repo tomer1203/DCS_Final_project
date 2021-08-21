@@ -35,7 +35,7 @@ void lcd_count_down(int times){
 }
 // 04
 void set_delay(int new_delay){
-	d = new_delay;
+	delay = new_delay;
 }
 // 05
 void clear_all_leds(){

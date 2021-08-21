@@ -8,7 +8,7 @@
 #ifndef SCRIPT_FUNCTIONS_H_
 #define SCRIPT_FUNCTIONS_H_
 
-int delay = 50;
+int delay;
 
 void blink_rgb(int times);
 void lcd_count_up(int times);
