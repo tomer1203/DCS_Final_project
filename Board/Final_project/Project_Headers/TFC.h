@@ -29,6 +29,7 @@
 
 
 #include "HardwareAbstraction/uart_functions.h"
+#include "HardwareAbstraction/script_functions.h"
 #include "HardwareAbstraction/halGPIO.h"
 #include "HardwareAbstraction/halLCD.h"
 
