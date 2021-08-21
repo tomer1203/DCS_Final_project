@@ -137,38 +137,6 @@ int read_line(){
 	if (file_system.state != READ_FILE_FS){
 		return NULL;
 	}
-	//
-	//---- start of fs
-	//200-B
-	//-- end of file
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//-- readpointer
-	//---- end of fs
-	
-	
-	//---- start of fs
-	//
-	//
-	//-readpointer
-	//- end of file
-	//
-	//
-	//
-	//
-	//-start file
-	//
-	//---- end of fs
-	//
-	//-- Imaginary end file
-	//
-	//
-	//
 	// decide how much you can read
 	end_line_address    = address_cyclic_add(file_system.read_pointer,16);
 	end_of_file_address = address_cyclic_add(file_system.file_list[file_system.read_file].start_pointer,file_system.file_list[file_system.read_file].size);
@@ -199,7 +167,25 @@ int read_line(){
 	}
 	return read_amount;
 }
-
+void read_commandline_init(int file_index){
+	file_system.read_file = file_index;
+	file_system.read_pointer = file_system.file_list[file_index].start_pointer;
+	
+}
+int read_commandline(char* new_line){
+	int i=0;
+	file_system.number_of_bytes_read+=1;
+	while (current_char != '\n'){
+		if (file_system.number_of_bytes_read >= file_system.file_list[file_system.read_file].size){
+			return 0;
+		}
+		new_line[i] = file_system.read_pointer;
+		file_system.read_pointer = address_cyclic_add(file_system.read_pointer,1);
+		i++;
+	}
+	new_line[i]='\0';
+	return 1;
+}
 // write_file_init_message //
 // check what message has been received and act accordingly
 // check if there is space and if not remove old files

@@ -92,8 +92,47 @@ void       gen_print(){
 	Print_two_lines(menu.submenu[line_select]->title,
 			        menu.submenu[get_next_line(line_select,menu.num_submenus)]->title);
 }
-
-StateModes script_enter() {}
+void parse_command(int command_p, int arg1_p, int arg2_p, char* command_line){
+	char Temp[3] = {0};
+	
+	if(command_line[0] = '\0')return;
+	Temp[0] = command_line[0];
+	Temp[1] = command_line[1];
+	command_p = atoi(Temp);
+	
+	if(command_line[2] = '\0')return;
+	Temp[0] = command_line[2];
+	Temp[1] = command_line[3];	
+	arg1_p = atoi(Temp);
+	
+	if(command_line[4] = '\0')return;
+	Temp[0] = command_line[4];
+	Temp[1] = command_line[5];
+	arg2_p = atoi(Temp);
+}
+StateModes script_enter() {
+	char  new_line[10];
+	int command,arg1,arg2;
+	int* command_p,arg1_p,arg2_p;
+	
+	command_p = &command;
+	arg1_p = &arg1;
+	arg2_p = &arg2;
+	read_commandline_init(file_select);
+	while (read_commandline(new_line)){
+		parse_command(command_p,arg1_p,arg2_p,new_line);
+		switch(command){
+		case(1):blink_rgb(arg1);break;
+		case(2):lcd_count_up(arg1);break;
+		case(3):lcd_count_down(arg1);break;
+		case(4):set_delay(arg1);break;
+		case(5):clear_all_leds();break;
+		case(6):servo_deg(arg1);break;
+		case(7):servo_scan(arg1,arg2);break;
+		case(8):sleep();break;
+		}		
+	}
+}
 void       script_scroll(){
 	if (line_select != menu.num_submenus-1) {
 		last_file_select = file_select;

@@ -53,6 +53,7 @@ typedef struct File_System{
 	
 	// read to lcd operations
 	int   read_file;
+	int   number_of_bytes_read;
 	char* read_pointer;   // not sure this is necessary
 	
 	// constants
@@ -66,6 +67,8 @@ void             initialize_file_system();
 File_descriptor* file_info(int index);
 int 			 read_file_init(int file_num);
 int              read_line(); // reads up to 16 chars or EOF
+void             read_commandline_init(int file_index);
+int              read_commandline(char* new_line);
 int              write_file_init_message(char* message);
 int				 write_file_chunck(char* write_data, int size);
 int              remove_last_file();

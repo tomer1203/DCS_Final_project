@@ -11,6 +11,11 @@
 
 unsigned int LightIntensity = MUDULO_REGISTER/2;  // Global variable
 
+distance_ready = 0;
+rising_edge=0;
+falling_edge=0;		  
+signal_taken=0;	  
+
 int main(void){
 	
 	ClockSetup();
