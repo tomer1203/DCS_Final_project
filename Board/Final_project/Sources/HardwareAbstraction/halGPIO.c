@@ -32,7 +32,7 @@ void PORTD_IRQHandler(void){
 	for(i=10000 ; i>0 ; i--); //delay, button debounce
 	
 	print_ui();
-	DelayMs(1000);
+	DelayMs(100);
 	
 	PORTD_ISFR |= PTD_7;  // clear interrupt flag bit of PTD7
 	PORTD_ISFR |= PTD_6;  // clear interrupt flag bit of PTD6
@@ -252,15 +252,15 @@ void Print(const char * s){
 	cursor_off;
 	lcd_clear();
 	lcd_goto(0);
-	DelayMs(10);
+	DelayMs(5);
 	
 	lcd_puts(s);
 	
 }
 void Print_two_lines(const char *s1,const char *s2){
 	lcd_clear();
-	lcd_goto(1);
-	DelayMs(10);
+	lcd_goto(0);
+	DelayMs(5);
 	lcd_puts(s1);
 	lcd_new_line;
 	lcd_puts(s2);
@@ -272,7 +272,7 @@ void Print_two_lines(const char *s1,const char *s2){
 void DelayUs(unsigned int cnt){
   
 	unsigned int i;
-        for(i=cnt ; i>0 ; i--)
+        for(i=(4347 * cnt)/1000 ; i>0 ; i--)
         		asm("nop"); // tha command asm("nop") takes raphly 1usec
         
 	
@@ -284,7 +284,7 @@ void DelayMs(unsigned int cnt){
   
 	unsigned int i;
         for(i=cnt ; i>0 ; i--)
-        	DelayUs(4347); // tha command asm("nop") takes raphly 1usec
+        	DelayUs(1000); // tha command asm("nop") takes raphly 1usec
         
 }
 //******************************************************************

@@ -22,7 +22,7 @@ volatile float falling_edge = 0;
 volatile unsigned int signal_taken = 0;	  
 
 int main(void){
-	int i;
+
 	ClockSetup();
 	InitGPIO();
 	InitTimers();

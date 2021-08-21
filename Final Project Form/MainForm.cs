@@ -30,8 +30,8 @@ namespace TerminalProject
 
         // For Files
         private string currentDirectoryPath;
-        private string filesToSendDirectory = "Terminal Project Files/Files to send";
-        private string filesRecievedDirectory = "Terminal Project Files/Files recieved";
+        private string filesToSendDirectory = "Final Project Files/Files to send";
+        private string filesRecievedDirectory = "Final Project Files/Files recieved";
         private string selectedFilePath = "";
         private string dataFilesPath = "";
 

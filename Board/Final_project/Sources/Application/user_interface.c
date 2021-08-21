@@ -16,10 +16,11 @@ void       script_print();
 void       gen_scroll();
 void       gen_print();
 void       init_script();
+int        get_next_line(int line,int menu_size);
 //                            Title           StateName       enter          scroll        print        init       #submenus
-Menu radar_detection_menu = {"1.Radar detect",RADAR_DETECT_E ,return_command,no_action    ,no_action   ,no_action  ,0};
+Menu radar_detection_menu = {"1.Radar detect",RADAR_DETECT_E ,return_command,no_action    ,no_action   ,no_action  ,0}; 
 Menu telemeter_menu       = {"2.Telemeter   ",TELEMETER_E    ,return_command,no_action    ,no_action   ,no_action  ,0};
-Menu script_menu          = {"3.Script      ",SCRIPT_E       ,script_enter  ,script_scroll,script_print,init_script,0};
+Menu script_menu          = {"3.Script      ",SCRIPT_E       ,script_enter  ,script_scroll,script_print,init_script,1}; // Script
 Menu configuration_menu   = {"4.Config      ",CONFIGURATION_E,gen_enter     ,gen_scroll   ,gen_print   ,no_action  ,2,{&main_menu,&baud_menu}};
 //Menu back_menu            = {"<-Back        ",IDLE_E         ,return_command,no_action    ,no_action   ,no_action  ,0};
 Menu baud_menu            = {"Baud= 9600    ",IDLE_E         ,return_command,no_action    ,no_action   ,no_action  ,0};
@@ -114,7 +115,10 @@ StateModes script_enter() {
 	char  new_line[10];
 	int command,arg1,arg2;
 	int* command_p,arg1_p,arg2_p;
-	
+	if (line_select == 0){
+		menu = main_menu;
+		return IDLE_E;
+	}
 	command_p = &command;
 	arg1_p = &arg1;
 	arg2_p = &arg2;
@@ -132,6 +136,7 @@ StateModes script_enter() {
 		case(8):sleep();break;
 		}		
 	}
+	return SCRIPT_E;
 }
 void       script_scroll(){
 	if (line_select != menu.num_submenus-1) {
@@ -140,7 +145,7 @@ void       script_scroll(){
 		last_file_descriptor = current_file_desc;
 		current_file_desc = file_info(file_select);
 	}
-	line_select = get_next_line(line_select);
+	line_select = get_next_line(line_select, menu.num_submenus);
 }
 void       script_print() {
 	if (line_select == 0) {
