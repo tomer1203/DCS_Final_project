@@ -86,6 +86,9 @@ void enablePITx(int x);
 void disablePITx(int x);
 void disableADC0();
 void enableADC0();
-void startTPMx(char x, int start);
+
+void InitTPM(char x);
+void StartTPMx(char x, int start);
+void SetTPMxDutyCycle(char x, int dutyCycle);
 
 #endif /* BOARDSUPPORT_H_ */

@@ -1,7 +1,7 @@
 #include "TFC.h"
 #include "mcg.h"
 
-#define MUDULO_REGISTER  0xEA60 // 60,000
+#define MUDULO_REGISTER  0x9275 - 1 // 18,750 -1
 
 // set I/O for switches and LEDs
 void InitGPIO() {
@@ -77,13 +77,13 @@ void InitTPM(char x){  // x={0,1,2}
 	switch(x){
 	case 0: // Init TPM 0 Channel 4 for PTD4 (? FTM0_CH4 ?) page 567  
 		TPM0_SC = 0; // to ensure that the counter is not running
-		TPM0_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler = 8, up-mode, counter-disable
+		TPM0_SC |= TPM_SC_PS(4)+TPM_SC_TOIE_MASK; //Prescaler = 8 / 32, up-mode, counter-disable
 		// TPM period = (MOD + 1) * CounterClock_period
-		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 50Hz = 24MHz/(8x60,000)
+		TPM0_MOD = MUDULO_REGISTER; // PWM frequency of 40Hz = 24MHz/(8x60,000)
 		TPM0_C4SC = 0;
 		// Edge Aligned , High-True pulse, channel interrupts enabled
 		TPM0_C4SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM0_C4V = 0x0CCD; // Duty Cycle 5% - servo deg = 0
+		TPM0_C4V = TPM_DC_VAL_MIN; // Duty Cycle 5% - servo deg = 0
 		TPM0_CONF = 0; 
 		break;
 	case 1:
@@ -108,26 +108,26 @@ void SetTPMxDutyCycle(char x, int dutyCycle){
 	
 	switch(x){
 	case 0:
-		TPM0_C4V |= dutyCycle; 
+		TPM0_C4V = dutyCycle; 
 		break;
 	case 1:
-		TPM1_C1V |= dutyCycle; 
+		TPM1_C1V = dutyCycle; 
 		break;
 	case 2:
-		TPM2_C1V |= dutyCycle; 
+		TPM2_C1V = dutyCycle; 
 		break;
 	}
 }
 //-----------------------------------------------------------------
 // Start TPMx
 //-----------------------------------------------------------------
-void startTPMx(char x, int start){
+void StartTPMx(char x, int start){
 	switch(x){
 	case 0:
 		if(start)
 			TPM0_SC |= TPM_SC_CMOD(1); //Start the TPM0 counter
 		else
-			TPM0_SC |= TPM_SC_CMOD(0); //Stop the TPM0 counter
+			TPM0_SC &= ~TPM_SC_CMOD(1); //Stop the TPM0 counter
 		break;
 	case 1:
 		if(start)

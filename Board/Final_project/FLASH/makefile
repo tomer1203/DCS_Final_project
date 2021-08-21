@@ -77,7 +77,7 @@ Final_project.elf: $(OBJS) $(USER_OBJS) ../Project_Settings/Linker_Files/MKL25Z1
 	@echo ' '
 
 Final_project.siz: Final_project.elf
-	@echo 'Executing target #20 $@'
+	@echo 'Executing target #21 $@'
 	@echo 'Invoking: ARM Ltd Windows GNU Print Size'
 	"$(ARMSourceryDirEnv)/arm-none-eabi-size"  --format=berkeley Final_project.elf
 	@echo 'Finished building: $@'

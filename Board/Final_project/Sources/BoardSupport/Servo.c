@@ -1,19 +1,12 @@
 #include "TFC.h"
 
-#define SERVO_TPM 0
-#define SERVO_DEG_MAX 180
-#define SERVO_DEG_MIN 0
-#define TPM_DC_VAL_MIN 3277 //  5% * 20ms = 1ms
-#define TPM_DC_VAL_MAX 6554 // 10% * 20ms = 2ms
-
-
 //////////////////////////////////
 //	Inits Servo
 /////////////////////////////////
 void InitServo(){
 	ClockSetupTPM(); // initialise tpm clock
 	InitTPM(SERVO_TPM);		 // configure pit 0
-	startTPMx(SERVO_TPM, 1); // start pit 0
+	StartTPMx(SERVO_TPM, 1); // start pit 
 }
 
 //////////////////////////////////
@@ -26,11 +19,13 @@ void WriteServo(int deg){
 	if( SERVO_DEG_MAX < deg || deg < SERVO_DEG_MIN ){
 		return;
 	}
-	startTPMx(SERVO_TPM, 0);
-	dutyCycle = TPM_DC_VAL_MIN *( deg / SERVO_DEG_MAX + 1);
+	
+	StartTPMx(SERVO_TPM, 0);
+	dutyCycle = TPM_DC_VAL_MIN  + (TPM_DC_VAL_MAX - TPM_DC_VAL_MIN) * (float)deg/(float)SERVO_DEG_MAX ;
 	SetTPMxDutyCycle(SERVO_TPM, dutyCycle);
-	startTPMx(SERVO_TPM, 1);
-	DelayMs(10);
+	StartTPMx(SERVO_TPM, 1);
+	DelayMs(4*180/9);
+
 }
 
 //////////////////////////////////////
@@ -40,6 +35,6 @@ void SweepServo(){
 	// TODO: work with PIT
 	
 	int deg;
-	for(deg=0 ; deg < 180 ; deg++)
+	for(deg=0 ; deg < 180 ; deg+=9)
 		WriteServo(deg);
 }

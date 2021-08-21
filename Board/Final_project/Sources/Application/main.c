@@ -22,7 +22,7 @@ volatile float falling_edge = 0;
 volatile unsigned int signal_taken = 0;	  
 
 int main(void){
-	
+	int i;
 	ClockSetup();
 	InitGPIO();
 	InitTimers();
@@ -31,10 +31,17 @@ int main(void){
 	InitUARTs();
 	
 	InitServo();
-	WriteServo(180);
+
+	RED_LED_TOGGLE;
+	DelayMs(2000);
+	RED_LED_TOGGLE;
 	
-	//while(1)
-		//SweepServo();
+	BLUE_LED_TOGGLE;
+	WriteServo(180);
+	DelayMs(2000);
+	BLUE_LED_TOGGLE;
+	
+	SweepServo();
 	
 	enablePIT();
 	disablePITx(1);
@@ -42,7 +49,7 @@ int main(void){
 	initialize_ui();
 	initialize_file_system();
 	print_ui();
-	WriteServo(180);
+	
 	Fsm();
 	return 0;
 	

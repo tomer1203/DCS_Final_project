@@ -284,7 +284,7 @@ void DelayMs(unsigned int cnt){
   
 	unsigned int i;
         for(i=cnt ; i>0 ; i--)
-        	DelayUs(1000); // tha command asm("nop") takes raphly 1usec
+        	DelayUs(4347); // tha command asm("nop") takes raphly 1usec
         
 }
 //******************************************************************
