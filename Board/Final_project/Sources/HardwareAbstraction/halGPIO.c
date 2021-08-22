@@ -7,6 +7,8 @@
 
 #include "TFC.h"
 void ftoa(float n, char* res, int afterpoint);
+float arr[100];
+int arr_index = 0;
 
 //-----------------------------------------------------------------
 //  PORTD - ISR = Interrupt Service Routine
@@ -62,14 +64,6 @@ void PIT_IRQHandler(){
 	
 }
 
-
-//// trigger
-//void FTM0_IRQHandler(){
-//	//TPM0_SC |= TPM_SC_TOF_MASK;
-//	TPM0_C1SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
-//	TPM2_SC |= TPM_SC_CMOD(1);  // Start the TPM2 counter
-//}
-
 //-----------------------------------------------------------------
 //  Ultra-sonic sensor Echo  - ISR
 //-----------------------------------------------------------------
@@ -84,8 +78,11 @@ void FTM0_IRQHandler(){
 		signal_taken = FALSE;
 		if(falling_edge < rising_edge)
 			return;
-		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
 		distance_ready = TRUE;
+		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
+		arr[arr_index++] = distance;
+		if(arr_index == 100) 
+			arr_index = 0;
 		//StartTPMx(0, FALSE);
 		clearTPM0();
 	}

@@ -96,7 +96,7 @@ void InitTPMx(char x){  // x={0,1,2}
 		// Input capture both edge detect
 		TPM0_C2SC |= TPM_CnSC_ELSB_MASK + TPM_CnSC_ELSA_MASK + TPM_CnSC_CHIE_MASK;
 		//TPM0_C2V = TPM_DC_VAL_MIN; // Duty Cycle 5% - servo deg = 0
-		TPM0_CONF = TPM_CONF_DBGMODE(3); 
+		TPM0_CONF = 0;
 		enable_irq(INT_TPM0-16); // Enable Interrupts 
 		set_irq_priority (INT_TPM0-16,0);  // Interrupt priority = 0 = max
 		break;
@@ -110,7 +110,7 @@ void InitTPMx(char x){  // x={0,1,2}
 		// Edge Aligned , High-True pulse, channel interrupts enabled
 		TPM1_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
 		TPM1_C0V = TPM_DC_VAL_MIN; // Duty Cycle 5% - servo deg = 0
-		TPM1_CONF |= TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
+		TPM1_CONF = 0;//TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
 		
 		break;
 	case 2: // Trigger
@@ -122,7 +122,7 @@ void InitTPMx(char x){  // x={0,1,2}
 		// Edge Aligned , High-True pulse, channel interrupts enabled
 		TPM2_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
 		TPM2_C0V = 10; // Duty Cycle( > 10us)
-		TPM2_CONF |= TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
+		TPM2_CONF = 0;//TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
 		break;
 	}
 		
