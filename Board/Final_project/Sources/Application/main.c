@@ -23,7 +23,6 @@ volatile unsigned int signal_taken = 0;
 
 int main(void){
 
-	ClockSetup();
 	InitGPIO();
 	InitTimers();
 
@@ -31,26 +30,15 @@ int main(void){
 	InitUARTs();
 	
 	InitServo();
-
-	RED_LED_TOGGLE;
-	DelayMs(2000);
-	RED_LED_TOGGLE;
 	
-	BLUE_LED_TOGGLE;
-	WriteServo(180);
-	DelayMs(2000);
-	BLUE_LED_TOGGLE;
-	
-	SweepServo();
-	
-	enablePIT();
-	disablePITx(1);
+	EnablePITModule(TRUE);
 	
 	initialize_ui();
 	initialize_file_system();
 	print_ui();
 	
 	Fsm();
+	
 	return 0;
 	
 }

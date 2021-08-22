@@ -41,18 +41,25 @@ namespace TerminalProject
 
         int WIDTH, HEIGHT, HAND;
 
-        private int handDeg, handDegBlack;       // in degree
-        private int handX, handY;                // HAND coordinate
-        private int handBlackX, handBlackY;      // black hand
+        private int handDegMain, handDegBlack;                       // in degree
+        private int handMainX, handMainY;                            // HAND coordinate
         private const int LIM = 15, MAX_SERVO_ANGLE = 180;
-        private int circleX, circleY;            //center of the circle
+        private int handBlackX, handBlackY;                          // black & green hand
+        private int[] handGreenX = new int[LIM], handGreenY = new int[LIM], handDegGreen = new int[LIM];
+        private int circleX, circleY;                                // center of the circle
         private int handStartAngle = -90;
 
         private bool left_to_right = true;
         // radar drawing
         private Bitmap bmp;
         private Pen pen;
+        private Pen[] penGreen = new Pen[LIM];
         private Graphics graphics;
+        private static double hue = Color.Green.GetHue();
+        private static double saturation = Color.Green.GetSaturation();
+        private static double brightness = Color.Green.GetBrightness();
+        private Color[] colorList = new Color[LIM];
+
 
         /*
          * Construstor
@@ -60,6 +67,9 @@ namespace TerminalProject
         public MainForm()
         {
             InitializeComponent();
+
+            Console.WriteLine("Main Form Init");
+
             this.MinimumSize = this.Size;
             this.MaximumSize = this.Size;
 
@@ -93,6 +103,8 @@ namespace TerminalProject
          */ 
         private void Form1_Load(object sender, EventArgs e) {
             AllocConsole();
+            Console.WriteLine("Main Form Load");
+            radarTextPanel.Visible = false;
 
             WIDTH = radarPanel.Height * 2;
             HEIGHT = radarPanel.Height;
@@ -106,11 +118,15 @@ namespace TerminalProject
             circleY = radarPanel.Height;
 
             //initial degree of HAND
-            handDeg = handStartAngle;
+            handDegMain = handStartAngle;
+
+            for (int i = 0; i < LIM; i++)
+                colorList[i] = ColorFromHSV(hue, saturation, brightness + (1- brightness)/LIM * i);
 
             //timer
-            t.Interval = 50; //in millisecond
+            t.Interval = 20; //in millisecond
             t.Tick += new EventHandler(this.t_Tick);
+
         }
 
 
@@ -125,43 +141,55 @@ namespace TerminalProject
         {
             //pen
             pen = new Pen(Color.Green, 1f);
+            for (int i = 0; i < LIM; i++)
+                penGreen[i] =  new Pen(colorList[i], 1f);
+            
 
             //graphics
             graphics = Graphics.FromImage(bmp);
 
-            angleLabel.Text = "Angle: " + (handDeg + 90);
+            angleLabel.Text = "Angle: " + (handDegMain + 90);
 
             //calculate x, y coordinate of HAND
-            if(left_to_right)
-                handDegBlack = (handDeg - LIM);
+            if (left_to_right)
+            {
+                handDegBlack = handDegMain - LIM;
+                for(int i = LIM-1 ; i > 0 ; i--)
+                    handDegGreen[i] = handDegMain - LIM + i+1;
+            }
             else
-                handDegBlack = (handDeg + LIM);
+            {
+                handDegBlack = handDegMain + LIM;
+                for (int i = LIM - 1; i > 0; i--)
+                    handDegGreen[i] = handDegMain + LIM - i-1;
+            }
 
             // swipe hand back and forth
-            if (handDeg == 90)
+            if (handDegMain == 90)
                 left_to_right = false;
-            else if(handDeg == -90)
+            else if(handDegMain == -90)
                 left_to_right = true;
 
-            if (handDeg >= 0 && handDeg <= MAX_SERVO_ANGLE)
+            // MAIN HAND
+            if (handDegMain >= 0 && handDegMain <= MAX_SERVO_ANGLE)
             {
                 // right half
                 // u in degree is converted into radian.
 
-                handX = circleX + (int)(HAND * Math.Sin(Math.PI * handDeg / 180));
-                handY = circleY - (int)(HAND * Math.Cos(Math.PI * handDeg / 180));
+                handMainX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegMain / 180));
+                handMainY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
             }
             else
             {
                 // left half
-                handX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDeg / 180));
-                handY = circleY - (int)(HAND * Math.Cos(Math.PI * handDeg / 180));
+                handMainX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegMain / 180));
+                handMainY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
             }
-
+            // BLACK HAND
             if (handDegBlack >= 0 && handDegBlack <= MAX_SERVO_ANGLE)
             {
                 //right half
-                //tu in degree is converted into radian.
+                //degree is converted into radian.
 
                 handBlackX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegBlack / 180));
                 handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
@@ -171,10 +199,32 @@ namespace TerminalProject
                 handBlackX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegBlack / 180));
                 handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
             }
+
+            // GREEN 2 HAND
+            for (int i = 0; i < LIM; i++)
+            {
+                if (handDegGreen[i] >= 0 && handDegGreen[i] <= MAX_SERVO_ANGLE)
+                {
+                    //right half
+                    //degree is converted into radian.
+
+                    handGreenX[i] = circleX + (int)(HAND * Math.Sin(Math.PI * handDegGreen[i] / 180));
+                    handGreenY[i] = circleY - (int)(HAND * Math.Cos(Math.PI * handDegGreen[i] / 180));
+
+                }
+                else
+                {
+
+                    handGreenX[i] = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegGreen[i] / 180));
+                    handGreenY[i] = circleY - (int)(HAND * Math.Cos(Math.PI * handDegGreen[i] / 180));
+
+                }
+            }
+
             //////////////////////////////
             //       Draw Radar 
             /////////////////////////////
-            
+
             // draw circles
             for (int i = 50 ; i < HAND ; i += 100)
             {
@@ -192,8 +242,13 @@ namespace TerminalProject
             }
 
             //draw HAND
+            graphics.DrawLine(pen, new Point(circleX, circleY), new Point(handMainX, handMainY));
+            for (int i = 0; i < LIM; i++)
+            {
+                graphics.DrawLine(penGreen[i], new Point(circleX, circleY), new Point(handGreenX[i], handGreenY[i]));
+                penGreen[i].Dispose();
+            }
             graphics.DrawLine(new Pen(Color.Black, 1f), new Point(circleX, circleY), new Point(handBlackX, handBlackY));
-            graphics.DrawLine(pen, new Point(circleX, circleY), new Point(handX, handY));
 
             //load bitmap in picturebox1
             radarPictureBox.Image = bmp;
@@ -204,13 +259,13 @@ namespace TerminalProject
 
             //update
             if(left_to_right)
-                handDeg++;
+                handDegMain++;
             else
-                handDeg--;
+                handDegMain--;
 
-            if (handDeg == MAX_SERVO_ANGLE)
+            if (handDegMain == MAX_SERVO_ANGLE)
             {
-                handDeg = handStartAngle;
+                handDegMain = handStartAngle;
             }
         } // ens tick-tock radar
 
@@ -228,7 +283,7 @@ namespace TerminalProject
             catch (Exception)
             {
                 serialPort.Close();
-                updateChatStatusLabel(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.PORT_ERROR));
+                updateRadarStatusLabel(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.PORT_ERROR));
                 this.Invoke((MethodInvoker)delegate
                 {
                     setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR);
@@ -253,7 +308,7 @@ namespace TerminalProject
             // Checksum check
             if (checksumStatus == CustomSerialPort.STATUS.CHECKSUM_ERROR)
             {
-                updateChatStatusLabel(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.CHECKSUM_ERROR));
+                updateRadarStatusLabel(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.CHECKSUM_ERROR));
                 Console.WriteLine(CustomSerialPort.STATUS.ToString(CustomSerialPort.STATUS.CHECKSUM_ERROR));
                 return;
             }
@@ -278,15 +333,24 @@ namespace TerminalProject
                     catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                     break;
 
-                // Recieve scanner info
+                // Recieve Scanner info
                 case CustomSerialPort.Type.SCAN:
                     int deg = int.Parse(val.Substring(0, 3));
                     float dist = float.Parse(val.Substring(3));
-                    Console.WriteLine("Telemeter: deg- " + deg + " dist- " + dist + " cm");
+                    Console.WriteLine("scan: deg- " + deg + " dist- " + dist + " cm");
                     this.Invoke((MethodInvoker)delegate
                     {
                         angleLabel.Text = deg.ToString();
                         distanceLabel.Text = dist.ToString();
+                    });
+                    break;
+
+                // Recieve Telemetria info
+                case CustomSerialPort.Type.TELMETERIA:
+                    Console.WriteLine("Telemetria: Distance- " + val);
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        telemetriaDistanceLabel.Text = val.ToString();
                     });
                     break;
 
@@ -395,11 +459,11 @@ namespace TerminalProject
             switch (status)
             {
                 case CustomSerialPort.STATUS.RECIEVING_MESSAGE:
-                    updateChatStatusLabel(CustomSerialPort.STATUS.ToString(status));
+                    updateRadarStatusLabel(CustomSerialPort.STATUS.ToString(status));
                     break;
 
                 case CustomSerialPort.STATUS.BUFFER_ERROR:
-                    updateChatStatusLabel(CustomSerialPort.STATUS.ToString(status));
+                    updateRadarStatusLabel(CustomSerialPort.STATUS.ToString(status));
                     CustomSerialPort.STATUS.bufferErrorCounter++;
                     if(CustomSerialPort.STATUS.bufferErrorCounter > CustomSerialPort.STATUS.BUFFER_ERROR_OVERFLOW)
                     {
@@ -412,7 +476,7 @@ namespace TerminalProject
                     break;
 
                 case CustomSerialPort.STATUS.OK:
-                    updateChatStatusLabel(CustomSerialPort.STATUS.ToString(status));
+                    updateRadarStatusLabel(CustomSerialPort.STATUS.ToString(status));
                     break;
                 default:
                     // TODO: maybe UI change
@@ -482,7 +546,7 @@ namespace TerminalProject
             if (keyEvent.KeyCode == Keys.Enter)
             {
                 if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage1"])
-                    telemetriaButton_Click(sender, new EventArgs());
+                    scanButton_Click(sender, new EventArgs());
                 else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage2"])
                     sendFileButton_Click(sender, new EventArgs());
             }
@@ -542,9 +606,9 @@ namespace TerminalProject
 
 
         /*
-         * Update Chat Status labels
+         * Update Radar Status labels
          */
-        private void updateChatStatusLabel(string statusLabelString)
+        private void updateRadarStatusLabel(string statusLabelString)
         {
             if (this.InvokeRequired)
             {
@@ -580,24 +644,76 @@ namespace TerminalProject
         /*
          * Scan Radar Button Click Listener
          */ 
-         //  $[Te]_|---|
         private void scanButton_Click(object sender, EventArgs e)
         {
             if (scanMode) // Stop scanning
             {
                 scanMode = false;
-                scanButton.Text = "Stop";
+                scanButton.Text = "Start Scan";
+                radarPictureBox.Visible = false;
+                radarTextPanel.Visible = false;
+                deg30Label.Visible = false;
+                deg60Label.Visible = false;
+                deg90Label.Visible = false;
+                deg120Label.Visible = false;
+                deg150Label.Visible = false;
+                telemetriaButton.Visible = true;
+                telemetriaDataTextBox.Visible = true;
+                telemetriaLabel.Visible = true;
+                telemetriaPanel.Visible = true;
+                radarPanel.BackColor = Color.Transparent;
                 t.Stop();
+               
 
             }
             else // start scanning
             {
                 scanMode = true;
-                scanButton.Text = "Scan";
+                scanButton.Text = "Stop Scan";
+                radarPictureBox.Visible = true;
+                radarTextPanel.Visible = true;
+                deg30Label.Visible = true;
+                deg60Label.Visible = true;
+                deg90Label.Visible = true;
+                deg120Label.Visible = true;
+                deg150Label.Visible = true;
+                telemetriaButton.Visible = false;
+                telemetriaDataTextBox.Visible = false;
+                telemetriaLabel.Visible = false;
+                telemetriaPanel.Visible = false;
+                radarPanel.BackColor = Color.Black;
                 t.Start();
+               
             }
            
+        }
 
+        /*
+         * Delete Script Button Click
+         */ 
+        private void deleteScriptButton_Click(object sender, EventArgs e)
+        {
+            if (selectedFilePath.Equals(""))
+                return;
+            Console.WriteLine(Path.GetFileName(selectedFilePath) + " Deleted");
+            File.Delete(selectedFilePath);
+            filesListView.Clear();
+
+        }
+
+        /*
+         * Save Script Button Click
+         */ 
+        private void saveScriptButton_Click(object sender, EventArgs e)
+        {
+            if (scriptNameTextBox.Text.Equals("") || scriptDataRichTextBox.Text.Equals(""))
+                return;
+            string path = Path.Combine(currentDirectoryPath, filesToSendDirectory, scriptNameTextBox.Text + ".txt");
+            File.WriteAllText(path, scriptDataRichTextBox.Text);
+            filesListView.Clear();
+            initializeFilesListView();
+            scriptNameTextBox.Text = "";
+            scriptDataRichTextBox.Text = "";
         }
 
 
@@ -656,7 +772,7 @@ namespace TerminalProject
         {
             this.filesListView.Scrollable = true;
             // Set Column
-            this.filesListView.Columns.Add("Name", 600, HorizontalAlignment.Left);
+            this.filesListView.Columns.Add("Name", 300, HorizontalAlignment.Left);
             this.filesListView.Columns.Add("Size", -2, HorizontalAlignment.Left);
             // get Directory
             dataFilesPath = Path.Combine(currentDirectoryPath, filesToSendDirectory);
@@ -715,6 +831,34 @@ namespace TerminalProject
         {
             e.Cancel = true;
             e.NewWidth = filesListView.Columns[e.ColumnIndex].Width;
+        }
+
+        /*
+         * Get Color From HSV 
+         */ 
+        private static Color ColorFromHSV(double hue, double saturation, double value)
+        {
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            double f = hue / 60 - Math.Floor(hue / 60);
+
+            value = value * 255;
+            int v = Convert.ToInt32(value);
+            int p = Convert.ToInt32(value * (1 - saturation));
+            int q = Convert.ToInt32(value * (1 - f * saturation));
+            int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+
+            if (hi == 0)
+                return Color.FromArgb(255, v, t, p);
+            else if (hi == 1)
+                return Color.FromArgb(255, q, v, p);
+            else if (hi == 2)
+                return Color.FromArgb(255, p, v, t);
+            else if (hi == 3)
+                return Color.FromArgb(255, p, q, v);
+            else if (hi == 4)
+                return Color.FromArgb(255, t, p, v);
+            else
+                return Color.FromArgb(255, v, p, q);
         }
     }
 }

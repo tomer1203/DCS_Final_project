@@ -75,17 +75,18 @@
 #define TFC_PUSH_BUTTON_0_PRESSED	((GPIOC_PDIR&TFC_PUSH_BUTT0N0_LOC)>0)
 #define TFC_PUSH_BUTTON_1_PRESSED	((GPIOC_PDIR&TFC_PUSH_BUTT0N1_LOC)>0)
 
+///////////// Boolean ///////////////////
+#define TRUE 1
+#define FALSE 0
+/////////////////////////////////////////
+
 void  InitGPIO();
 void ClockSetup();
 void InitPIT();
 
-void setPITInterval(unsigned int interval);
-void enablePIT();
-void disablePIT();
-void enablePITx(int x);
-void disablePITx(int x);
-void disableADC0();
-void enableADC0();
+void SetPITInterval(unsigned int interval);
+void EnablePITModule();
+void EnablePITx(int x, int enable);
 
 void InitTPM(char x);
 void StartTPMx(char x, int start);
