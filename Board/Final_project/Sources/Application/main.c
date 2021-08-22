@@ -27,24 +27,23 @@ int main(void){
 	InitGPIO();
 	InitTimers();
 
-	InitADCs();
 	InitUARTs();
 	
-	InitServo();
-
-	RED_LED_TOGGLE;
-	DelayMs(2000);
-	RED_LED_TOGGLE;
+    InitServo();
+    InitSensors();
+//	RED_LED_TOGGLE;
+//	DelayMs(2000);
+//	RED_LED_TOGGLE;
+//	
+//	BLUE_LED_TOGGLE;
+//	WriteServo(180);
+//	DelayMs(2000);
+//	BLUE_LED_TOGGLE;
+//	
+//	SweepServo();
 	
-	BLUE_LED_TOGGLE;
-	WriteServo(180);
-	DelayMs(2000);
-	BLUE_LED_TOGGLE;
-	
-	SweepServo();
-	
-	enablePIT();
-	disablePITx(1);
+	//enablePIT(1);
+	//disablePITx(1);
 	
 	initialize_ui();
 	initialize_file_system();

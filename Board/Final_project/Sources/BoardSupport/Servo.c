@@ -8,7 +8,11 @@ void InitServo(){
 	InitTPM(SERVO_TPM);		 // configure pit 0
 	StartTPMx(SERVO_TPM, 1); // start pit 
 }
-
+void InitSensors(){
+	ClockSetupTPM(); // initialise tpm clock
+	InitTPM(SENSOR_TRIG);
+	InitTPM(SENSOR_ECHO);
+}
 //////////////////////////////////
 //	Change Servo's deg
 /////////////////////////////////

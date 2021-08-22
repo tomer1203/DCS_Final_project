@@ -48,6 +48,15 @@ void InitGPIO() {
 	/////// Servo /////////////////
 	GPIOD_PDDR |= PORT_LOC(4);  // PTD4 is output
 	PORTD_PCR4 = PORT_PCR_MUX(4); // TPM0_CH1- ALT4
+	
+	/////// Ultra-sonic sensor/////
+	// Trigger
+	PORTA_PCR12 = PORT_PCR_MUX(3); // TPM1_CH1- ALT3
+	PORTC_PCR7  = PORT_PCR_MUX(1); // set GPIO
+	GPIOC_PDDR  |= PORT_LOC(7);  // PTA1 is output
+	// Echo
+	//GPIOA_PDDR &= ~PORT_LOC(1);  // PTD4 is input
+	PORTA_PCR1 = PORT_PCR_MUX(3); // TPM2_CH1- ALT3
 }
 
 //-----------------------------------------------------------------
@@ -89,16 +98,22 @@ void InitTPM(char x){  // x={0,1,2}
 	case 1:
 		break;
 	case 2: 
+		// Echo PTA2 TPM2_Ch1
 		TPM2_SC = 0; // to ensure that the counter is not running
-		TPM2_SC |= TPM_SC_PS(3)+TPM_SC_TOIE_MASK; //Prescaler = 8, up-mode, counter-disable
-		TPM2_MOD = MUDULO_REGISTER; // PWM frequency of 250Hz = 24MHz/(8x12,000)
-		TPM2_C0SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM2_C0V = 0xFFFF; 
-		TPM2_C1SC |= TPM_CnSC_MSB_MASK + TPM_CnSC_ELSB_MASK + TPM_CnSC_CHIE_MASK;
-		TPM2_C1V = 0xFFFF;
-		TPM2_CONF = 0;
+		TPM2_SC |= TPM_SC_PS(5) + TPM_SC_TOF_MASK;  //Prescaler =32, clear flag
+		//24Mhz/32=0.75Mhz, T=1.333us*2^16=0.0873s= overflow time
+		TPM2_MOD = 0xFFFF; // value of overflow 
+		TPM2_C0SC |= TPM_CnSC_ELSB_MASK + TPM_CnSC_ELSA_MASK + TPM_CnSC_CHIE_MASK + TPM_CnSC_CHF_MASK;//input capture on both rising and falling
+		TPM2_CONF |= TPM_CONF_DBGMODE(3); //LPTPM counter continues in debug mode
+		enable_irq(INT_TPM2-16); // Enable Interrupts 
+		set_irq_priority (INT_TPM2-16,0);  // Interrupt priority = 0 = max
 		break;
 	}
+	
+	
+	
+
+	
 }
 
 //-----------------------------------------------------------------
@@ -139,7 +154,7 @@ void StartTPMx(char x, int start){
 		if(start)
 			TPM2_SC |= TPM_SC_CMOD(1); //Start the TPM2 counter
 		else
-			TPM2_SC |= TPM_SC_CMOD(0); //Stop the TPM2 counter
+			TPM2_SC &= ~TPM_SC_CMOD(1); //Stop the TPM2 counter
 		break;
 	}
 	
@@ -149,17 +164,17 @@ void StartTPMx(char x, int start){
 //-----------------------------------------------------------------
 void ClockSetupTPM(){
 	    
-	    pll_init(8000000, LOW_POWER, CRYSTAL,4,24,MCGOUT); //Core Clock is now at 48MHz using the 8MHZ Crystal
-		
-	    //Clock Setup for the TPM requires a couple steps.
-	    //1st,  set the clock mux
-	    //See Page 124 of f the KL25 Sub-Family Reference Manual
-	    SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK;// We Want MCGPLLCLK/2=24MHz (See Page 196 of the KL25 Sub-Family Reference Manual
-	    SIM_SOPT2 &= ~(SIM_SOPT2_TPMSRC_MASK);
-	    SIM_SOPT2 |= SIM_SOPT2_TPMSRC(1); //We want the MCGPLLCLK/2 (See Page 196 of the KL25 Sub-Family Reference Manual
-		//Enable the Clock to the TPM0 and PIT Modules
-		//See Page 207 of f the KL25 Sub-Family Reference Manual
-		SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK + SIM_SCGC6_TPM2_MASK;
+	pll_init(8000000, LOW_POWER, CRYSTAL,4,24,MCGOUT); //Core Clock is now at 48MHz using the 8MHZ Crystal
+	
+	//Clock Setup for the TPM requires a couple steps.
+	//1st,  set the clock mux
+	//See Page 124 of f the KL25 Sub-Family Reference Manual
+	SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK;// We Want MCGPLLCLK/2=24MHz (See Page 196 of the KL25 Sub-Family Reference Manual
+	SIM_SOPT2 &= ~(SIM_SOPT2_TPMSRC_MASK);
+	SIM_SOPT2 |= SIM_SOPT2_TPMSRC(1); //We want the MCGPLLCLK/2 (See Page 196 of the KL25 Sub-Family Reference Manual
+	//Enable the Clock to the TPM0 and PIT Modules
+	//See Page 207 of f the KL25 Sub-Family Reference Manual
+	SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK + SIM_SCGC6_TPM2_MASK;
 	    // TPM_clock = 24MHz , PIT_clock = 48MHz
 	    
 }
@@ -170,11 +185,11 @@ void ClockSetupTPM(){
 void InitPIT() {
 	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK; //Enable the Clock to the PIT Modules
 	// Timer 0
-	PIT_LDVAL0 = 0x000FBB80; // setup timer 0 for 1msec counting period
+	PIT_LDVAL0 = 0x00186A00; // setup timer 0 for 15hz counting period
+	PIT_LDVAL1 = 0x000912C0; // setup timer 0 for 10msec counting period
 	//PIT_TCTRL0 = PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK; //enable PIT0 and its interrupt
 
 	// Timer 1
-	PIT_LDVAL1 = 0x00DFBB80; // setup timer 0 for 1msec counting period
 	//PIT_TCTRL1 = PIT_TCTRL_TEN_MASK ;//| PIT_TCTRL_TIE_MASK; //enable PIT0 and its interrupt
 
 	PIT_MCR |= PIT_MCR_FRZ_MASK; // stop the pit when in debug mode
@@ -191,39 +206,33 @@ void setPITInterval(unsigned int interval) {
 }
 
 /*
- * Enable PIT Module
+ * Enable/Disable PIT Module
  */
-void enablePIT() {
-	PIT_MCR &= ~PIT_MCR_MDIS_MASK; // Enables the PIT module	
-}
-
-/*
- * Disable PIT Module
- */
-void disablePIT() {
-	PIT_MCR |= PIT_MCR_MDIS_MASK; // Disables the PIT module	
-
-}
-
-/*
- * Enable PIT x
- */
-void enablePITx(int x) {
-	if (x == 1) {
-		PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK;
-	} else if (x == 0) {
-		PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK;
+void enablePIT(int enable) {
+	if (enable){
+		PIT_MCR &= ~PIT_MCR_MDIS_MASK; // Enables the PIT module	
+	} else {
+		PIT_MCR |= PIT_MCR_MDIS_MASK; // Disables the PIT module	
 	}
 }
 
+
 /*
- * Disable PIT x
+ * Enable/Disable PIT x
  */
-void disablePITx(int x) {
-	if (x == 1) {
-		PIT_TCTRL1 &= ~(PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK);
-	} else if (x == 0) {
-		PIT_TCTRL0 &= ~(PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK);
+void enablePITx(int x, int enable) {
+	if (enable){
+		if (x == 1) {
+			PIT_TCTRL1 |= PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK;
+		} else if (x == 0) {
+			PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK;
+		}
+	} else {
+		if (x == 1) {
+			PIT_TCTRL1 &= ~(PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK);
+		} else if (x == 0) {
+			PIT_TCTRL0 &= ~(PIT_TCTRL_TIE_MASK | PIT_TCTRL_TEN_MASK);
+		}
 	}
 }
 

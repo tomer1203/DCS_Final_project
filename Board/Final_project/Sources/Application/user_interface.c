@@ -93,23 +93,23 @@ void       gen_print(){
 	Print_two_lines(menu.submenu[line_select]->title,
 			        menu.submenu[get_next_line(line_select,menu.num_submenus)]->title);
 }
-void parse_command(int command_p, int arg1_p, int arg2_p, char* command_line){
+void parse_command(int* command_p, int* arg1_p, int* arg2_p, char* command_line){
 	char Temp[3] = {0};
 	
-	if(command_line[0] = '\0')return;
+	if(command_line[0] == '\0')return;
 	Temp[0] = command_line[0];
 	Temp[1] = command_line[1];
-	command_p = atoi(Temp);
+	*command_p = (int)strtol(Temp, NULL, 16);
 	
-	if(command_line[2] = '\0')return;
+	if(command_line[2] == '\0')return;
 	Temp[0] = command_line[2];
 	Temp[1] = command_line[3];	
-	arg1_p = atoi(Temp);
+	*arg1_p = (int)strtol(Temp, NULL, 16);
 	
-	if(command_line[4] = '\0')return;
+	if(command_line[4] == '\0')return;
 	Temp[0] = command_line[4];
 	Temp[1] = command_line[5];
-	arg2_p = atoi(Temp);
+	*arg2_p = (int)strtol(Temp, NULL, 16);
 }
 StateModes script_enter() {
 	char  new_line[10];
