@@ -57,7 +57,7 @@ void InitGPIO() {
 	PORTE_PCR22 = PORT_PCR_MUX(3); // TPM1_CH1- ALT3
 	//pit
 	PORTC_PCR7  = PORT_PCR_MUX(1); // set GPIO
-	GPIOC_PDDR  |= PORT_LOC(7);    // PTA1 is output
+	GPIOC_PDDR  |= PORT_LOC(7);    // PTC7 is output
 	// Echo
 	PORTE_PCR29  = PORT_PCR_MUX(3); // TPM0_CH2 - ALT3
 }
@@ -212,11 +212,16 @@ void InitPIT() {
 	set_irq_priority(INT_PIT - 16, 0);  // Interrupt priority = 0 = max
 }
 
+
 /*
  * Sets PIT's counter 
  */
-void SetPITInterval(unsigned int interval) {
-	PIT_LDVAL0 = interval;
+void SetPITxInterval(int x, unsigned int ms) {
+	unsigned int interval = ms*24000;
+	switch (x){
+	case (0): PIT_LDVAL0 = interval; break;
+	case (1): PIT_LDVAL1 = interval; break;
+	}
 }
 
 /*

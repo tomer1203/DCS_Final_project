@@ -14,6 +14,9 @@
 
 
 int interval;
+int enterON;
+int scroll_downON;
+int print_uiON;
 
 typedef enum StateModes{
 	IDLE_E,

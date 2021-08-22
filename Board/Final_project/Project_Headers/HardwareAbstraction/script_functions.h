@@ -9,7 +9,7 @@
 #define SCRIPT_FUNCTIONS_H_
 
 extern int delay;
-
+void WaitDelay(int d);
 void blink_rgb(int times);
 void lcd_count_up(int times);
 void lcd_count_down(int times);

@@ -15,32 +15,30 @@ unsigned int LightIntensity = MUDULO_REGISTER/2;  // Global variable
 //rising_edge=0;
 //falling_edge=0;		  
 //signal_taken=0;	  
-char distance_ready = 0;
-float distance;
+int distance_ready = 0;
+unsigned int distance;
 volatile float rising_edge = 0;
 volatile float falling_edge = 0;
 volatile unsigned int signal_taken = 0;	  
 
 int main(void){
-
 	InitGPIO();
 	InitTimers();
-
-	InitADCs();
 	InitUARTs();
 	
+	InitTPMx(0);
 	InitTPMx(1);
 	InitTPMx(2);
 	StartTPMx(1, TRUE);
-	StartTPMx(2, TRUE);
 	
 	InitPIT();
 	EnablePITModule(TRUE);
-	enablePITx(0, TRUE);
+
 	
     InitServo();
     InitSensors();
-	
+    enable_sensor(FALSE);
+    init_hal();
 	initialize_ui();
 	initialize_file_system();
 	print_ui();

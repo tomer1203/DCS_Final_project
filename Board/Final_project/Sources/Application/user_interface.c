@@ -10,6 +10,8 @@ const char back[16] = "<=Back";
 StateModes return_command();
 void       no_action();
 StateModes gen_enter();
+void rad_detect_sys();
+void telemeter_system();
 StateModes script_enter();
 void       script_scroll();
 void       script_print();
@@ -17,14 +19,14 @@ void       gen_scroll();
 void       gen_print();
 void       init_script();
 int        get_next_line(int line,int menu_size);
-//                            Title           StateName       enter          scroll        print        init       #submenus
-Menu radar_detection_menu = {"1.Radar detect",RADAR_DETECT_E ,return_command,no_action    ,no_action   ,no_action  ,0}; 
-Menu telemeter_menu       = {"2.Telemeter   ",TELEMETER_E    ,return_command,no_action    ,no_action   ,no_action  ,0};
-Menu script_menu          = {"3.Script      ",SCRIPT_E       ,script_enter  ,script_scroll,script_print,init_script,1}; // Script
-Menu configuration_menu   = {"4.Config      ",CONFIGURATION_E,gen_enter     ,gen_scroll   ,gen_print   ,no_action  ,2,{&main_menu,&baud_menu}};
+//                            Title           StateName       enter            scroll        print        init       #submenus
+Menu radar_detection_menu = {"1.Radar detect",RADAR_DETECT_E ,rad_detect_sys  ,no_action    ,no_action   ,no_action  ,0}; 
+Menu telemeter_menu       = {"2.Telemeter   ",TELEMETER_E    ,telemeter_system,no_action    ,no_action   ,no_action  ,0};
+Menu script_menu          = {"3.Script      ",SCRIPT_E       ,script_enter    ,script_scroll,script_print,init_script,1}; // Script
+Menu configuration_menu   = {"4.Config      ",CONFIGURATION_E,gen_enter       ,gen_scroll   ,gen_print   ,no_action  ,2,{&main_menu,&baud_menu}};
 //Menu back_menu            = {"<-Back        ",IDLE_E         ,return_command,no_action    ,no_action   ,no_action  ,0};
-Menu baud_menu            = {"Baud= 9600    ",IDLE_E         ,return_command,no_action    ,no_action   ,no_action  ,0};
-Menu main_menu =            {"<-Main menu   ",IDLE_E         ,gen_enter     ,gen_scroll   ,gen_print   ,no_action  ,4 ,{&radar_detection_menu,&telemeter_menu,&script_menu,&configuration_menu}};
+Menu baud_menu            = {"Baud= 9600    ",IDLE_E         ,return_command  ,no_action    ,no_action   ,no_action  ,0};
+Menu main_menu =            {"<-Main menu   ",IDLE_E         ,gen_enter       ,gen_scroll   ,gen_print   ,no_action  ,4 ,{&radar_detection_menu,&telemeter_menu,&script_menu,&configuration_menu}};
 
 
 void copy_16chars(char* to, char* from) {
@@ -93,6 +95,68 @@ void       gen_print(){
 	Print_two_lines(menu.submenu[line_select]->title,
 			        menu.submenu[get_next_line(line_select,menu.num_submenus)]->title);
 }
+void rad_detect_sys(){
+	int degree = 0;
+	char dis_ascii[16];
+	char Angle[4] = {0};
+	char Angle_padded[4] = {0};
+	char final_message[20] = {0};
+	enterON = FALSE;
+	enable_sensor(TRUE);
+	while (1){
+		WriteServo(degree);
+		degree+=9;
+		if (degree == 189){
+			degree = 0;
+		}
+		while(!distance_ready){
+			WaitDelay(10);
+		}
+		if (distance_ready){
+			sprintf(dis_ascii,"%d",out_distance);
+			sprintf(Angle,"%d",degree);
+			if (degree < 10){
+				strcpy(Angle_padded, "00");
+				strcat(Angle_padded,Angle);
+			} else if (degree < 100){
+				strcpy(Angle_padded, "0");
+				strcat(Angle_padded,Angle);
+			}else{
+				strcpy(Angle_padded,Angle);
+			}
+			strcpy(final_message,Angle_padded);
+			strcat(final_message,dis_ascii);
+			send2pc("Sc",final_message);
+			Print(final_message);
+			distance_ready = FALSE;
+		}
+		if (enterON){
+			enterON = FALSE;
+			enable_sensor(FALSE);
+			return;
+		}
+		WaitDelay(50);
+	}
+}
+void telemeter_system(){
+	char str[16];
+	enterON = FALSE;
+	enable_sensor(TRUE);
+	while(1){
+		if (distance_ready){
+			sprintf(str,"%d",out_distance);
+			send2pc("Te",str);
+			Print(str);
+			distance_ready = FALSE;
+		}
+		if (enterON){
+			enterON = FALSE;
+			enable_sensor(FALSE);
+			return;
+		}
+		WaitDelay(50);
+	}
+}
 void parse_command(int* command_p, int* arg1_p, int* arg2_p, char* command_line){
 	char Temp[3] = {0};
 	
@@ -123,6 +187,7 @@ StateModes script_enter() {
 	arg1_p = &arg1;
 	arg2_p = &arg2;
 	read_commandline_init(file_select);
+	
 	while (read_commandline(new_line)){
 		parse_command(command_p,arg1_p,arg2_p,new_line);
 		switch(command){

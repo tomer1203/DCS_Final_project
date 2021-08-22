@@ -7,10 +7,22 @@
 #include "TFC.h"
 int delay = 50;
 // 01
+void WaitDelay(int d){
+	// set pit delay to d
+	SetPITxInterval(0,d);
+	// start pit 
+	enablePITx(0,TRUE);
+	while (!PitDelayDone){ 
+		wait(); // wait for pit interrupt
+	}
+	// shut down pit
+	enablePITx(0,FALSE);
+	PitDelayDone = FALSE;
+}
 void blink_rgb(int times){
-	int i = 0,j=0;
+	int i = 0,j = 0;
 	for (i=0;i<times; i++){
-		//blink
+		
 		for (j=0;j<8;j++){
 			RGB_LED_OFF;
 			if (j&1){
@@ -22,7 +34,7 @@ void blink_rgb(int times){
 			if (j&4){
 				BLUE_LED_ON;
 			}
-			DelayMs(10*delay);
+			WaitDelay(delay);
 		}
 	}
 }
@@ -34,7 +46,7 @@ void lcd_count_up(int times){
 		for (j=0; j<=10;j++){
 			sprintf(str,"%d",j);
 			Print(str);
-			DelayMs(10*delay);
+			WaitDelay(delay);
 		}
 	}	
 }
@@ -46,13 +58,13 @@ void lcd_count_down(int times){
 		for (j=10; j>=0;j--){
 			sprintf(str,"%d",j);
 			Print(str);
-			DelayMs(10*delay);
+			WaitDelay(delay);
 		}
 	}
 }
 // 04
 void set_delay(int new_delay){
-	delay = new_delay;
+	delay = 10 * new_delay;
 }
 // 05
 void clear_all_leds(){

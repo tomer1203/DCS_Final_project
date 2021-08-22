@@ -84,7 +84,7 @@ void  InitGPIO();
 void ClockSetup();
 void InitPIT();
 
-void SetPITInterval(unsigned int interval);
+void SetPITxInterval(int x, unsigned int interval);
 void EnablePITModule();
 void EnablePITx(int x, int enable);
 

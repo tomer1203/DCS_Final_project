@@ -17,16 +17,36 @@ void Fsm(void){
 	state = IDLE_E;
 	lastState = state;
 	interval = 0;
-	
+	enterON = FALSE;
+	scroll_downON = FALSE;
+	print_uiON = FALSE;
+
 	while(1){
-		
-		switch (state){
-		
-		case IDLE_E:
-			wait(); 
-			break;
-		
+		if (enterON){
+			StateModes next_state = menu.enter_callback();
+			state = next_state;
+			enterON = FALSE;
 		}
+		if (scroll_downON){
+			menu.scroll_down_callback();
+			scroll_downON = FALSE;
+		}
+		if (print_uiON){
+			menu.print_callback();
+			print_uiON = FALSE;
+		}
+		wait();
+//		switch (state){
+//		
+//		case IDLE_E:
+//			wait(); 
+//			break;
+//		
+//		}
+//		case SCRIPT_E:
+//			break;
+//		case TELEMETER_E:
+//			break;
 	}
 	
 }

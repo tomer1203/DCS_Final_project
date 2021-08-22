@@ -7,9 +7,29 @@
 
 #include "TFC.h"
 void ftoa(float n, char* res, int afterpoint);
-float arr[100];
-int arr_index = 0;
 
+void init_sensor_hal(){
+	int i = 0;
+	for (i = 0; i<DIST_AVG_SIZE;i++){
+		distances[i] = 0;
+	}
+	distance_index = 0;
+	acc_distance = 0;
+}
+void init_hal(){
+	init_sensor_hal();
+	PitDelayDone = FALSE;
+}
+void enable_sensor(int enable){
+	if (enable){
+		init_sensor_hal();
+		StartTPMx(0, TRUE);
+		StartTPMx(2, TRUE);
+	} else {
+		StartTPMx(0, FALSE);
+		StartTPMx(2, FALSE);
+	}
+}
 //-----------------------------------------------------------------
 //  PORTD - ISR = Interrupt Service Routine
 //-----------------------------------------------------------------
@@ -19,12 +39,14 @@ void PORTD_IRQHandler(void){
 	if (PORTD_ISFR & PTD_7) {
 		if(!(GPIOD_PDIR & PTD_7)){
 			RED_LED_TOGGLE;
-			scroll_down();
+			//scroll_down();
+			scroll_downON = TRUE;
 		}
 	}
 	if(PORTD_ISFR & PTD_6){
 		if(!(GPIOD_PDIR & PTD_6)){
-			enter();
+			//enter();
+			enterON = TRUE;
 			BLUE_LED_TOGGLE;
 		}
 	}
@@ -33,7 +55,8 @@ void PORTD_IRQHandler(void){
 	while(!(GPIOD_PDIR & PTD_6) );// wait of release the button
 	for(i=10000 ; i>0 ; i--); //delay, button debounce
 	
-	print_ui();
+	//print_ui();
+	print_uiON = TRUE;
 	DelayMs(100);
 	
 	PORTD_ISFR |= PTD_7;  // clear interrupt flag bit of PTD7
@@ -46,17 +69,13 @@ void PORTD_IRQHandler(void){
 void PIT_IRQHandler(){
 	
     if(PIT_TFLG0 & PIT_TFLG_TIF_MASK){
-        enablePITx(PIT_FALLING,1);
-        GPIOC_PSOR |= PORT_LOC(7);
-        StartTPMx(0, TRUE);
         PIT_TFLG0 = PIT_TFLG_TIF_MASK; //clear the Pit 0 Irq flag 
+        PitDelayDone = TRUE;
         //RED_LED_ON;
         
     }
     
     if(PIT_TFLG1 & PIT_TFLG_TIF_MASK){
-        enablePITx(PIT_FALLING,0);
-        GPIOC_PCOR |= PORT_LOC(7);
         PIT_TFLG1 = PIT_TFLG_TIF_MASK; //clear the Pit 1 Irq flag
         //RED_LED_OFF;
         
@@ -69,6 +88,7 @@ void PIT_IRQHandler(){
 //-----------------------------------------------------------------
 void FTM0_IRQHandler(){
 	GREEN_LED_TOGGLE;
+	int last_value;
 	if (signal_taken == FALSE){    // Capture Rising Edge 
 		rising_edge = TPM0_C2V;    // Time of rising edge in Echo pulse
 		signal_taken = TRUE;
@@ -78,11 +98,17 @@ void FTM0_IRQHandler(){
 		signal_taken = FALSE;
 		if(falling_edge < rising_edge)
 			return;
+		
+		distance = (falling_edge - rising_edge);  //Calculate distance from sensor (in room temp)
+		last_value = distances[distance_index];
+		distances[distance_index++] = distance;
+		if (distance_index == DIST_AVG_SIZE){
+			distance_index = 0;
+		}
+		acc_distance += distance - last_value;
+		out_distance = acc_distance >> 3;
+		
 		distance_ready = TRUE;
-		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
-		arr[arr_index++] = distance;
-		if(arr_index == 100) 
-			arr_index = 0;
 		//StartTPMx(0, FALSE);
 		clearTPM0();
 	}
