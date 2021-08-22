@@ -29,9 +29,15 @@ int main(void){
 	InitADCs();
 	InitUARTs();
 	
-	InitServo();
+	InitTPMx(1);
+	InitTPMx(2);
+	StartTPMx(1, TRUE);
+	StartTPMx(2, TRUE);
 	
+	InitPIT();
 	EnablePITModule(TRUE);
+	enablePITx(0, TRUE);
+	
     InitServo();
     InitSensors();
 	

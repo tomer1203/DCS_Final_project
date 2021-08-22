@@ -88,8 +88,10 @@ void SetPITInterval(unsigned int interval);
 void EnablePITModule();
 void EnablePITx(int x, int enable);
 
-void InitTPM(char x);
+void InitTPMx(char x);
 void StartTPMx(char x, int start);
 void SetTPMxDutyCycle(char x, int dutyCycle);
+
+void clearTPM0();
 
 #endif /* BOARDSUPPORT_H_ */

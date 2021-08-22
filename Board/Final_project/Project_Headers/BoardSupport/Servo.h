@@ -11,7 +11,7 @@
 
 #define PIT_RISING 0
 #define PIT_FALLING 1
-#define SERVO_TPM 0
+#define SERVO_TPM 1
 #define SENSOR_TRIG 1
 #define SENSOR_ECHO 2
 #define SERVO_DEG_MAX 180
