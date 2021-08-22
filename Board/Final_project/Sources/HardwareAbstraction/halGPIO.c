@@ -42,16 +42,45 @@ void PORTD_IRQHandler(void){
 // PIT - ISR = Interrupt Service Routine
 //-----------------------------------------------------------------
 void PIT_IRQHandler(){
-	
+	StartTPMx(2, 1);
 	if(PIT_TFLG0 & PIT_TFLG_TIF_MASK){
+		enablePITx(PIT_FALLING,1);
+		GPIOC_PSOR |= PORT_LOC(7);
+		StartTPMx(2, 1);
 		PIT_TFLG0 = PIT_TFLG_TIF_MASK; //clear the Pit 0 Irq flag 
+		//RED_LED_ON;
+		
 	}
 	
 	if(PIT_TFLG1 & PIT_TFLG_TIF_MASK){
-		enableADC0();
+		enablePITx(PIT_FALLING,0);
+		GPIOC_PCOR |= PORT_LOC(7);
 		PIT_TFLG1 = PIT_TFLG_TIF_MASK; //clear the Pit 1 Irq flag
+		//RED_LED_OFF;
+		
 	}
 }
+
+
+// echo
+void FTM2_IRQHandler(){
+	if (signal_taken ==0){
+		rising_edge = TPM2_C0V;    // Time of rising edge in Echo pulse
+		signal_taken = 1;
+	}
+	else{
+		falling_edge = TPM2_C0V;   // Time of falling edge in Echo pulse
+		signal_taken = 0;
+		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
+		distance_ready = 1;
+		TPM2_SC |= TPM_SC_CMOD(0);  // Stop the TPM2 counter
+		TPM2_CNT = 1;
+	}
+	//TPM2_SC |= TPM_SC_TOF_MASK;
+	TPM2_C0SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
+}
+
+
 
 
 // format:
@@ -188,58 +217,19 @@ void changeBaudrate(){
 	baud_menu.title[10] = baudRate[4];
 }
 
-//-----------------------------------------------------------------
-// ADC0 - ISR = Interrupt Service Routine
-//-----------------------------------------------------------------
-void ADC0_IRQHandler(){
-	int intData;
-	float data;
-	char data_string[10];
-	
-	intData = ADC0_RA;
-	data = (float)intData; // 4000
-	
-	data = (data*3.3)/(4095.0);
-	ftoa(data, data_string, 3);
-	//	uint8_t data_LSB = 0xFF & data;
-	//uint8_t data_MSB = (0x0F00 & data) >> 8;
-	
-	//itoa( data ,data_string ,10);
-	//Print(data_string);
-	
-}
-
-// trigger
-void FTM0_IRQHandler(){
-	//TPM0_SC |= TPM_SC_TOF_MASK;
-	TPM0_C1SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
-	TPM2_SC |= TPM_SC_CMOD(1);  // Start the TPM2 counter
-}
-
-// echo
-void FTM2_IRQHandler(){
-	if (signal_taken ==0){
-		rising_edge = TPM2_C0V;    // Time of rising edge in Echo pulse
-		signal_taken = 1;
-	}
-	else{
-		falling_edge = TPM2_C0V;   // Time of falling edge in Echo pulse
-		signal_taken = 0;
-		distance = (falling_edge - rising_edge)/43.3;  //Calculate distance from sensor (in room temp)
-		distance_ready = 1;
-		TPM2_SC |= TPM_SC_CMOD(0);  // Stop the TPM2 counter
-		TPM2_CNT = 1;
-	}
-	//TPM2_SC |= TPM_SC_TOF_MASK;
-	TPM2_C0SC |= TPM_CnSC_CHF_MASK; 				//Manual flag down of the timer
-}
-
+//// trigger
+//void FTM1_IRQHandler(){
+//	TPM1_C1SC |= TPM_CnSC_CHF_MASK;
+//	TPM2_SC   |= TPM_SC_CMOD(1);
+//}
 
 /*
  * Initialises Timers
  */
 void InitTimers(){
 	InitPIT();
+	enablePIT(1);
+	enablePITx(PIT_RISING,1);
 	ClockSetupTPM();
 	InitTPM(0);
 }

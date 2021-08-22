@@ -32,6 +32,8 @@ int main(void){
 	InitServo();
 	
 	EnablePITModule(TRUE);
+    InitServo();
+    InitSensors();
 	
 	initialize_ui();
 	initialize_file_system();

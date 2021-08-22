@@ -174,16 +174,17 @@ void read_commandline_init(int file_index){
 }
 int read_commandline(char* new_line){
 	int i=0;
-	file_system.number_of_bytes_read+=1;
-	while (file_system.read_pointer != '\n'){
+	while (*file_system.read_pointer != '\r'){
 		if (file_system.number_of_bytes_read >= file_system.file_list[file_system.read_file].size){
 			return 0;
 		}
-		new_line[i] = file_system.read_pointer;
+		new_line[i] = *file_system.read_pointer;
 		file_system.read_pointer = address_cyclic_add(file_system.read_pointer,1);
+		file_system.number_of_bytes_read+=1;
 		i++;
 	}
 	new_line[i]='\0';
+	file_system.read_pointer = address_cyclic_add(file_system.read_pointer,2);// clear the \r\n
 	return 1;
 }
 // write_file_init_message //
