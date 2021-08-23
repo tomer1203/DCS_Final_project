@@ -239,24 +239,6 @@ void init_script(){
 //		Actions
 ////////////////////////////////
 
-//void chat_action(){
-//	char* line = getChatLine(line_select);
-//	send2pc(TYPE.TEXT,line);
-//}
-//
-//void read_action(){
-//	read_file_init(last_file_select);
-//	read_line();
-//	copy_16chars(last_read_line, reading_Line);
-//	read_line();
-//	copy_16chars(current_read_line, reading_Line);
-//}
-//
-//void send_file_action(){
-//	send_file2pc(last_file_select);
-//}
-
-
 /////////////////////////////////
 //		Get Next Line
 ////////////////////////////////

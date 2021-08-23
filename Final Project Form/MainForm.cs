@@ -47,15 +47,11 @@ namespace TerminalProject
         private int WIDTH, HEIGHT, HAND;
         private int handDegMain;                                     // in degree
         private int handGreenX, handGreenY, handRedX, handRedY;      // HAND coordinate
-        private const int LIM = 15, MAX_SERVO_ANGLE = 180;
-        //private int[] handGreenX = new int[LIM], handGreenY = new int[LIM], handDegGreen = new int[LIM];
-        //private int[] handRedX = new int[LIM], handRedY = new int[LIM];
+        private const int LIM = 5, MAX_SERVO_ANGLE = 180;
         private int circleX, circleY;                                // center of the circle
         private int handStartAngle = -90;
-        private int handIndex = 0;
         private Point[] linesArray = new Point[3 * LIM];
 
-        private bool left_to_right = true;
         // radar drawing
         private Bitmap bmp;
         private Pen pen = new Pen(Color.Green, 2.5f);
@@ -140,7 +136,6 @@ namespace TerminalProject
             }
             greenColorList[0] = Color.Green;
             greenColorList[LIM - 1] = Color.Black;
-
             redColorList[0] = Color.Red;
             redColorList[LIM - 1] = Color.Black;
 
@@ -224,13 +219,13 @@ namespace TerminalProject
             Point end_p    = new Point(handRedX, handRedY);
 
             // Shift Lines
-            for (int i = 0; i < linesArray.Length - 3; i += 3)
+            for (int i = linesArray.Length - 1 ; i > 0 ; i -= 3)
             {
                 if (linesArray[i].IsEmpty)
                     break;
-                linesArray[i + 3] = linesArray[i];
-                linesArray[i + 4] = linesArray[i + 1];
-                linesArray[i + 5] = linesArray[i + 2];
+                linesArray[i] = linesArray[i - 3];
+                linesArray[i - 1] = linesArray[i - 4];
+                linesArray[i - 2] = linesArray[i - 5];
             }
             // insert new line
             linesArray[0] = start_p;
@@ -304,7 +299,7 @@ namespace TerminalProject
             switch (opc)
             {
                 // Baud rate change acknoledge
-                case CustomSerialPort.Type.BAUDRATE:
+                case CustomSerialPort.TYPE.BAUDRATE:
                     try
                     {
                         serialPort.Close();
@@ -321,40 +316,38 @@ namespace TerminalProject
                     break;
 
                 // Recieve Scanner info
-                case CustomSerialPort.Type.SCAN:
+                case CustomSerialPort.TYPE.SCAN:
                     int deg = int.Parse(val.Substring(0, 3));
                     int tpmDiff = int.Parse(val.Substring(3));
-                    // time diff: 1 / (24M/8)  | 24MHz = tpm clk , 8 = tpm prescaler
-                    // float tpmTimeDiff = (float)tpmDiff / (float) 3000000; 
-                    // float dist = tpmTimeDiff * 17000;
-                    float dist = (float)tpmDiff / (float)176.4705882;
+                    float dist = calcDistsnce(tpmDiff);
                     Console.WriteLine("scan: deg- " + deg + " dist- " + dist + " cm");
                     this.Invoke((MethodInvoker)delegate
                     {
                         if(!scanMode)
                             scanButton_Click(this,EventArgs.Empty);
                         RadarVisualisation(deg, dist);
-                        angleLabel.Text = "Angle: " + (handDegMain + 90);
+                        angleLabel.Text = "Angle: " + deg;
                         distanceLabel.Text = "Distance: " + dist.ToString("#.##");
                     });
                     break;
 
                 // Recieve Telemetria info
-                case CustomSerialPort.Type.TELMETERIA:
-                    Console.WriteLine("Telemetria: Distance- " + val);
+                case CustomSerialPort.TYPE.TELMETERIA:
+                    Console.WriteLine("Telemetria: Distance- " + float.Parse(val) + "cm" );
                     this.Invoke((MethodInvoker)delegate
                     {
-                        telemetriaDistanceLabel.Text = "Distance: " + val.ToString() + "cm";
+                        telemetriaDistanceLabel.Text = "Distance: " + calcDistsnce(float.Parse(val));
+                        telemetriaCmLabel.Visible = true;
                     });
                     break;
 
                 // Get MCU Serial Port Status
-                case CustomSerialPort.Type.STATUS:
+                case CustomSerialPort.TYPE.STATUS:
                     handleStatusMessage(int.Parse(val));
                     break;
 
                 // Recieving file
-                case CustomSerialPort.Type.FILE_START:
+                case CustomSerialPort.TYPE.FILE_START:
                     selectTab(1);
                     if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_OK)
                     {
@@ -373,7 +366,7 @@ namespace TerminalProject
                     break;
 
                 // Recieving file's Name
-                case CustomSerialPort.Type.FILE_NAME:
+                case CustomSerialPort.TYPE.FILE_NAME:
                     if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
                         break;
                     CustomSerialPort.RFile.Name = val;
@@ -384,7 +377,7 @@ namespace TerminalProject
                     break;
 
                 // Recieving file's Size
-                case CustomSerialPort.Type.FILE_SIZE:
+                case CustomSerialPort.TYPE.FILE_SIZE:
                     if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
                         break;
                     CustomSerialPort.RFile.Size = int.Parse(val);
@@ -394,7 +387,7 @@ namespace TerminalProject
                     break;
 
                 // Recieving file's Data
-                case CustomSerialPort.Type.FILE_DATA:
+                case CustomSerialPort.TYPE.FILE_DATA:
                     if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
                     {
                         Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -418,7 +411,7 @@ namespace TerminalProject
                     break;
 
                 // File recieved ok 
-                case CustomSerialPort.Type.FILE_END:
+                case CustomSerialPort.TYPE.FILE_END:
                     if (int.Parse(val) == CustomSerialPort.STATUS.OK)
                     {
                         updateFileTransferStatusLabel("\"" + Path.GetFileName(selectedFilePath) + "\" sent successfully");
@@ -446,8 +439,20 @@ namespace TerminalProject
         } // END handleMessage
 
         /*
-         * Handle Status Type Message
+         * Calculates distance from TPM register diff
          */ 
+        private float calcDistsnce(float tpmDiff)
+        {
+            // time diff: 1 / (24M/8)  | 24MHz = tpm clk , 8 = tpm prescaler
+
+            // float tpmTimeDiff = (float)tpmDiff / (float) 3000000; 
+            // float dist = tpmTimeDiff * 17000;
+            return (float)tpmDiff / (float)176.4705882;
+        } 
+
+        /*
+         * Handle Status Type Message
+         */
         private void handleStatusMessage(int status)
         {
             switch (status)
@@ -625,13 +630,20 @@ namespace TerminalProject
 
             // Send Message to MCU
             try
-            {   
-                serialPort.sendMessage(CustomSerialPort.Type.TEXT, telemetriaDataTextBox.Text);
+            {
+                int deg = int.Parse(telemetriaDataTextBox.Text);
+                if(deg > MAX_SERVO_ANGLE || deg < 0 )
+                {
+                    updateRadarStatusLabel("servo degree range error");
+                    return;
+                }
+                serialPort.sendMessage(CustomSerialPort.TYPE.TELMETERIA, telemetriaDataTextBox.Text);
                 telemetriaDataTextBox.Text = "";
+                updateRadarStatusLabel("");
             }
             catch (Exception)
             {
-                setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR);
+                updateRadarStatusLabel("sevo degree accepts only integers in range [0,180]");
             }
         }
 
@@ -643,6 +655,7 @@ namespace TerminalProject
             if (scanMode) // Stop scanning
             {
                 scanMode = false;
+                serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR, "");
                 scanButton.Text = "Start Scan";
                 radarPictureBox.Visible = false;
                 radarTextPanel.Visible = false;
@@ -659,12 +672,11 @@ namespace TerminalProject
                 telemetriaPanel.Visible = true;
                 radarPanel.BackColor = Color.Transparent;
                 t.Stop();
-               
-
             }
             else // start scanning
             {
                 scanMode = true;
+                serialPort.sendMessage(CustomSerialPort.TYPE.SCAN,"");
                 maskedDistance = float.Parse(maskedDistanceTextBox.Text);
                 scanButton.Text = "Stop Scan";
                 radarPictureBox.Visible = true;
@@ -682,7 +694,6 @@ namespace TerminalProject
                 telemetriaPanel.Visible = false;
                 radarPanel.BackColor = Color.Black;
                 t.Start();
-               
             }
            
         }

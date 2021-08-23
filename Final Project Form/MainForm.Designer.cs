@@ -52,6 +52,7 @@
             this.telemetriaLabel = new System.Windows.Forms.Label();
             this.scanButton = new System.Windows.Forms.Button();
             this.radarTextPanel = new System.Windows.Forms.Panel();
+            this.cmRadarPanelLabel = new System.Windows.Forms.Label();
             this.angleLabel = new System.Windows.Forms.Label();
             this.distanceLabel = new System.Windows.Forms.Label();
             this.radarPictureBox = new System.Windows.Forms.PictureBox();
@@ -72,7 +73,7 @@
             this.connectingPictureBox = new System.Windows.Forms.PictureBox();
             this.configurationsLabel = new System.Windows.Forms.Label();
             this.settingsPanel = new System.Windows.Forms.Panel();
-            this.cmRadarPanelLabel = new System.Windows.Forms.Label();
+            this.telemetriaCmLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.radarPanel.SuspendLayout();
@@ -264,6 +265,7 @@
             // 
             // telemetriaPanel
             // 
+            this.telemetriaPanel.Controls.Add(this.telemetriaCmLabel);
             this.telemetriaPanel.Controls.Add(this.telemetriaAngleLabel);
             this.telemetriaPanel.Controls.Add(this.telemetriaDistanceLabel);
             this.telemetriaPanel.Location = new System.Drawing.Point(121, 226);
@@ -324,6 +326,17 @@
             this.radarTextPanel.Name = "radarTextPanel";
             this.radarTextPanel.Size = new System.Drawing.Size(214, 77);
             this.radarTextPanel.TabIndex = 1;
+            // 
+            // cmRadarPanelLabel
+            // 
+            this.cmRadarPanelLabel.AutoSize = true;
+            this.cmRadarPanelLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.cmRadarPanelLabel.ForeColor = System.Drawing.Color.Green;
+            this.cmRadarPanelLabel.Location = new System.Drawing.Point(179, 15);
+            this.cmRadarPanelLabel.Name = "cmRadarPanelLabel";
+            this.cmRadarPanelLabel.Size = new System.Drawing.Size(32, 20);
+            this.cmRadarPanelLabel.TabIndex = 2;
+            this.cmRadarPanelLabel.Text = "cm";
             // 
             // angleLabel
             // 
@@ -557,16 +570,16 @@
             this.settingsPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
             this.settingsPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
-            // cmRadarPanelLabel
+            // telemetriaCmLabel
             // 
-            this.cmRadarPanelLabel.AutoSize = true;
-            this.cmRadarPanelLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.cmRadarPanelLabel.ForeColor = System.Drawing.Color.Green;
-            this.cmRadarPanelLabel.Location = new System.Drawing.Point(179, 15);
-            this.cmRadarPanelLabel.Name = "cmRadarPanelLabel";
-            this.cmRadarPanelLabel.Size = new System.Drawing.Size(32, 20);
-            this.cmRadarPanelLabel.TabIndex = 2;
-            this.cmRadarPanelLabel.Text = "cm";
+            this.telemetriaCmLabel.AutoSize = true;
+            this.telemetriaCmLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaCmLabel.Location = new System.Drawing.Point(322, 23);
+            this.telemetriaCmLabel.Name = "telemetriaCmLabel";
+            this.telemetriaCmLabel.Size = new System.Drawing.Size(40, 25);
+            this.telemetriaCmLabel.TabIndex = 6;
+            this.telemetriaCmLabel.Text = "cm";
+            this.telemetriaCmLabel.Visible = false;
             // 
             // MainForm
             // 
@@ -653,6 +666,7 @@
         private System.Windows.Forms.TextBox maskedDistanceTextBox;
         private System.Windows.Forms.Label maskDistanceLabel;
         private System.Windows.Forms.Label cmRadarPanelLabel;
+        private System.Windows.Forms.Label telemetriaCmLabel;
     }
 }
 

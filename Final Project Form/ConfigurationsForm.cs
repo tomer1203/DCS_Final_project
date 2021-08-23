@@ -109,7 +109,7 @@ namespace TerminalProject
                 try
                 {
                     mSerialPort.Open();
-                    mSerialPort.sendMessage(CustomSerialPort.Type.BAUDRATE, baudrate.ToString());
+                    mSerialPort.sendMessage(CustomSerialPort.TYPE.BAUDRATE, baudrate.ToString());
                     // mSerialPort.Close();
                     // Delay is needed befor opening the port again
                     //Thread.Sleep(CustomSerialPort.CONFIGURE_DELAY);

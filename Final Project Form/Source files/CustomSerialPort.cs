@@ -17,11 +17,11 @@ namespace TerminalProject.Source_files
         public const string CUSTOM_FORMAT = "$[{0}]{1}|{2}|{3}";
         public const int CUSTOM_FORMAT_LENGTH = 11; 
         public const int PACKET_SIZE = 128;
-        public const int SEND_DELAY = 200;
+        public const int SEND_DELAY = 120;
         public const int CONFIGURE_DELAY = 80;
 
         // Message types
-        public static class Type {
+        public static class TYPE {
             // Messages
             public const string TEXT = "Tx";
             // Baudrate
@@ -38,6 +38,7 @@ namespace TerminalProject.Source_files
             public const string SERVO_DEG = "Sd";
             public const string TELMETERIA = "Te";
             public const string SCAN = "Sc";
+            public const string STOP_RADAR = "Sr";
         }
 
         // STATUS TYPE
@@ -60,6 +61,7 @@ namespace TerminalProject.Source_files
             public const int RECIEVING_OK = 0;
             public const int RECIEVING_FILE = 1;
             public const int RECIEVING_ERROR = 2;
+
         }
 
         // Recieving file handeling
@@ -150,7 +152,7 @@ namespace TerminalProject.Source_files
                     // get ready for next transaction
                     myBuffer = "";
                     dataLen = pollCnt = 0;
-                    return (Type.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
+                    return (TYPE.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
                 }
                 // Check if data len ok
                 if (dataLen == myBuffer.Length - CUSTOM_FORMAT_LENGTH)
@@ -163,10 +165,10 @@ namespace TerminalProject.Source_files
                     // get ready for next transaction
                     myBuffer = "";
                     dataLen = pollCnt = 0;
-                    return (Type.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
+                    return (TYPE.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
                 }
                 // Still Receiving 
-                else { return (Type.STATUS, STATUS.RECIEVING_MESSAGE.ToString(), -1); }
+                else { return (TYPE.STATUS, STATUS.RECIEVING_MESSAGE.ToString(), -1); }
 
             } // Error receiving data
             else if (myBuffer.Length > CUSTOM_FORMAT_LENGTH)
@@ -174,9 +176,9 @@ namespace TerminalProject.Source_files
                 // get ready for next transaction
                 myBuffer = "";
                 dataLen = pollCnt = 0;
-                return (Type.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
+                return (TYPE.STATUS, STATUS.BUFFER_ERROR.ToString(), -1);
             }
-            else { return (Type.STATUS, STATUS.RECIEVING_MESSAGE.ToString(), -1); }
+            else { return (TYPE.STATUS, STATUS.RECIEVING_MESSAGE.ToString(), -1); }
 
 
             // Format of Data: $[--]#|___|__ while # is checksum, -- is 2 chars opc
@@ -214,11 +216,11 @@ namespace TerminalProject.Source_files
 
 
             // File descriptors
-            sendMessage(Type.FILE_START, "");
+            sendMessage(TYPE.FILE_START, "");
             Thread.Sleep(SEND_DELAY);
-            sendMessage(Type.FILE_NAME, file.Name);
+            sendMessage(TYPE.FILE_NAME, file.Name);
             Thread.Sleep(SEND_DELAY);
-            sendMessage(Type.FILE_SIZE, file.Length.ToString());
+            sendMessage(TYPE.FILE_SIZE, file.Length.ToString());
             Thread.Sleep(SEND_DELAY);
 
             string text = File.ReadAllText(filePath);
@@ -238,14 +240,14 @@ namespace TerminalProject.Source_files
                     sizeSent += text.Substring(i * PACKET_SIZE, leftovers).Length;
                     Console.WriteLine(text.Substring(i * PACKET_SIZE, leftovers));
                     EventHub.OnFileSendingProgress("sent " + sizeSent + "/" + file.Length.ToString() + " bytes", EventArgs.Empty);
-                    sendMessage(Type.FILE_DATA, text.Substring(i * PACKET_SIZE, leftovers));
+                    sendMessage(TYPE.FILE_DATA, text.Substring(i * PACKET_SIZE, leftovers));
                     return;
                 }
 
                 sizeSent += text.Substring(i * PACKET_SIZE, PACKET_SIZE).Length;
                 Console.WriteLine(text.Substring(i * PACKET_SIZE, PACKET_SIZE));
                 EventHub.OnFileSendingProgress("sent " + sizeSent + " / " + file.Length.ToString() + " bytes", EventArgs.Empty);
-                sendMessage(Type.FILE_DATA, text.Substring(i * PACKET_SIZE, PACKET_SIZE ));
+                sendMessage(TYPE.FILE_DATA, text.Substring(i * PACKET_SIZE, PACKET_SIZE ));
                 Thread.Sleep(SEND_DELAY);
             }
 

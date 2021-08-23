@@ -5,7 +5,7 @@
  *      Author: tomer
  */
 #include "TFC.h"
-int delay = 50;
+int delay = 500;
 // 01
 void WaitDelay(int d){
 	// set pit delay to d
@@ -74,6 +74,7 @@ void clear_all_leds(){
 void servo_deg(int degree){
 	char msg[20] = {0};
 	WriteServo(degree);
+	enable_sensor(TRUE);
 	while(!distance_ready){
 		WaitDelay(10);
 	}
@@ -83,12 +84,14 @@ void servo_deg(int degree){
 		Print(msg);
 		distance_ready = FALSE;
 	}
+	enable_sensor(FALSE);
 }
 // 07
 void servo_scan(int left_angle,int right_angle){
 	int angle = left_angle;
 	char msg[20] = {0};
 	WriteServo(left_angle);
+	enable_sensor(TRUE);
 	while(angle<right_angle){
 		while(!distance_ready){
 					WaitDelay(10);
@@ -103,6 +106,7 @@ void servo_scan(int left_angle,int right_angle){
 		WriteServo(angle);
 
 	}
+	enable_sensor(FALSE);
 
 }
 // 08
