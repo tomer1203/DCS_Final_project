@@ -205,9 +205,18 @@ void handleMessage(){
 		
 	default:
 		// ACTIONS //
-		
+		if (is_stopRadar_command(string_buffer)){
+			stopRadar = TRUE;
+		}
+		else if (is_scan_command(string_buffer)) {
+			activateScan = TRUE;
+		}
+		else if (is_telemeter_command(string_buffer)) {
+			WriteServo(atoi(strip_command(string_buffer)));
+			activateTelemeter = TRUE;
+		}
 		// print message to chat
-		if (is_chat_command(string_buffer)) {
+		else if (is_chat_command(string_buffer)) {
 			Print(strip_command(string_buffer));
 		}
 		// receiving a file

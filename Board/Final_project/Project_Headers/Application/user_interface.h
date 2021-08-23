@@ -48,5 +48,7 @@ File_descriptor *current_file_desc;
 void print_ui();
 void scroll_down();
 StateModes enter();
-
+char* build_scan_msg(char* msg, int dis, int deg);
+StateModes rad_detect_sys();
+StateModes telemeter_system();
 #endif /* USER_INTERFACE_H_ */

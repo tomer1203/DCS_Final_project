@@ -20,7 +20,9 @@ void Fsm(void){
 	enterON = FALSE;
 	scroll_downON = FALSE;
 	print_uiON = FALSE;
-
+	stopRadar = FALSE;
+	activateScan = FALSE;	
+	activateTelemeter = FALSE;
 	while(1){
 		if (enterON){
 			StateModes next_state = menu.enter_callback();
@@ -35,6 +37,15 @@ void Fsm(void){
 			menu.print_callback();
 			print_uiON = FALSE;
 		}
+		if (activateScan){
+			rad_detect_sys();
+			activateScan = FALSE;
+		}
+		if (activateTelemeter){
+			telemeter_system();
+			activateTelemeter = FALSE;
+		}
+		stopRadar = FALSE;
 		wait();
 //		switch (state){
 //		

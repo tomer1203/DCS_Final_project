@@ -50,6 +50,27 @@ int is_name_command(char* string){
 	}
 }
 
+int is_scan_command(char* string){
+	if (string[0]=='$' && string[1]=='[' && string[2]=='S' && string[3]=='c' && string[4]==']'){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+int is_telemeter_command(char* string){
+	if (string[0]=='$' && string[1]=='[' && string[2]=='T' && string[3]=='e' && string[4]==']'){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+int is_stopRadar_command(char* string){
+	if (string[0]=='$' && string[1]=='[' && string[2]=='S' && string[3]=='r' && string[4]==']'){
+		return 1;
+	} else {
+		return 0;
+	}
+}
 char* strip_command(char* string){
 	return &string[11];
 }

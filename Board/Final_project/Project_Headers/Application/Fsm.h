@@ -17,6 +17,9 @@ int interval;
 int enterON;
 int scroll_downON;
 int print_uiON;
+int stopRadar;
+int activateScan;	
+int activateTelemeter;
 
 typedef enum StateModes{
 	IDLE_E,

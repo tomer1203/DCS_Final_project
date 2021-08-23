@@ -10,8 +10,6 @@ const char back[16] = "<=Back";
 StateModes return_command();
 void       no_action();
 StateModes gen_enter();
-void rad_detect_sys();
-void telemeter_system();
 StateModes script_enter();
 void       script_scroll();
 void       script_print();
@@ -95,12 +93,29 @@ void       gen_print(){
 	Print_two_lines(menu.submenu[line_select]->title,
 			        menu.submenu[get_next_line(line_select,menu.num_submenus)]->title);
 }
-void rad_detect_sys(){
-	int degree = 0;
+char* build_scan_msg(char* msg, int dis, int deg){
 	char dis_ascii[16];
 	char Angle[4] = {0};
 	char Angle_padded[4] = {0};
-	char final_message[20] = {0};
+	
+	sprintf(dis_ascii,"%d",dis);
+	sprintf(Angle,"%d",deg);
+	if (deg < 10){
+		strcpy(Angle_padded, "00");
+		strcat(Angle_padded,Angle);
+	} else if (deg < 100){
+		strcpy(Angle_padded, "0");
+		strcat(Angle_padded,Angle);
+	}else{
+		strcpy(Angle_padded,Angle);
+	}
+	strcpy(msg,Angle_padded);
+	strcat(msg,dis_ascii);
+	return msg;
+}
+StateModes rad_detect_sys(){
+	int degree = 0;
+	char msg[20] = {0};
 	enterON = FALSE;
 	enable_sensor(TRUE);
 	while (1){
@@ -113,32 +128,20 @@ void rad_detect_sys(){
 			WaitDelay(10);
 		}
 		if (distance_ready){
-			sprintf(dis_ascii,"%d",out_distance);
-			sprintf(Angle,"%d",degree);
-			if (degree < 10){
-				strcpy(Angle_padded, "00");
-				strcat(Angle_padded,Angle);
-			} else if (degree < 100){
-				strcpy(Angle_padded, "0");
-				strcat(Angle_padded,Angle);
-			}else{
-				strcpy(Angle_padded,Angle);
-			}
-			strcpy(final_message,Angle_padded);
-			strcat(final_message,dis_ascii);
-			send2pc("Sc",final_message);
-			Print(final_message);
+			build_scan_msg(msg,out_distance,degree);
+			send2pc("Sc",msg);
+			Print(msg);
 			distance_ready = FALSE;
 		}
-		if (enterON){
+		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
-			return;
+			return state;
 		}
 		WaitDelay(200);//50
 	}
 }
-void telemeter_system(){
+StateModes telemeter_system(){
 	char str[16];
 	enterON = FALSE;
 	enable_sensor(TRUE);
@@ -149,10 +152,10 @@ void telemeter_system(){
 			Print(str);
 			distance_ready = FALSE;
 		}
-		if (enterON){
+		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
-			return;
+			return state;
 		}
 		WaitDelay(50);
 	}

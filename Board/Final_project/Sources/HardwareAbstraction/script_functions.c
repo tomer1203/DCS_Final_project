@@ -72,14 +72,40 @@ void clear_all_leds(){
 }
 // 06
 void servo_deg(int degree){
+	char msg[20] = {0};
 	WriteServo(degree);
-	// TODO: Send degree and distance to pc
+	while(!distance_ready){
+		WaitDelay(10);
+	}
+	if (distance_ready){
+		build_scan_msg(msg,out_distance,degree);
+		send2pc("Sc",msg);
+		Print(msg);
+		distance_ready = FALSE;
+	}
 }
 // 07
 void servo_scan(int left_angle,int right_angle){
-	// TODO: 
+	int angle = left_angle;
+	char msg[20] = {0};
+	WriteServo(left_angle);
+	while(angle<right_angle){
+		while(!distance_ready){
+					WaitDelay(10);
+		}
+		if (distance_ready){
+			build_scan_msg(msg,out_distance,angle);
+			send2pc("Sc",msg);
+			Print(msg);
+			distance_ready = FALSE;
+		}
+		angle+=SERVO_DEG_CHANGE;
+		WriteServo(angle);
+
+	}
+
 }
 // 08
 void sleep(){
-	wait(); // TODO: maybe turn this to stop?
+	wait();
 }
