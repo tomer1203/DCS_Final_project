@@ -91,11 +91,10 @@ void InitTPMx(char x){  // x={0,1,2}
 		TPM0_SC = 0; // to ensure that the counter is not running
 		TPM0_SC |= TPM_SC_PS(3); //Prescaler 8
 		// TPM period = (MOD + 1) * CounterClock_period
-		TPM0_MOD = SERVO_MUDULO_REGISTER; // PWM frequency of 40Hz = 24MHz/(8x60,000)
+		TPM0_MOD = 0xFFFF;//SERVO_MUDULO_REGISTER; // PWM frequency of 40Hz = 24MHz/(8x60,000)
 		TPM0_C2SC = 0;
 		// Input capture both edge detect
 		TPM0_C2SC |= TPM_CnSC_ELSB_MASK + TPM_CnSC_ELSA_MASK + TPM_CnSC_CHIE_MASK;
-		//TPM0_C2V = TPM_DC_VAL_MIN; // Duty Cycle 5% - servo deg = 0
 		TPM0_CONF = 0;
 		enable_irq(INT_TPM0-16); // Enable Interrupts 
 		set_irq_priority (INT_TPM0-16,0);  // Interrupt priority = 0 = max

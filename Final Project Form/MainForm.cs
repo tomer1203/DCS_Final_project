@@ -28,37 +28,48 @@ namespace TerminalProject
         // InData
         private ValueTuple<string, string, int> inData = new ValueTuple<string, string, int>();
 
+        ////////////////
         // For Files
+        ////////////////
         private string currentDirectoryPath;
         private string filesToSendDirectory = "Final Project Files/Files to send";
         private string filesRecievedDirectory = "Final Project Files/Files recieved";
         private string selectedFilePath = "";
         private string dataFilesPath = "";
 
+        ////////////////
         // Radar System
+        ////////////////
         private bool scanMode = false;
-        System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+        private float maskedDistance =  200; // cm
+        private System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
 
-        int WIDTH, HEIGHT, HAND;
-
-        private int handDegMain, handDegBlack;                       // in degree
-        private int handMainX, handMainY;                            // HAND coordinate
+        private int WIDTH, HEIGHT, HAND;
+        private int handDegMain;                                     // in degree
+        private int handGreenX, handGreenY, handRedX, handRedY;      // HAND coordinate
         private const int LIM = 15, MAX_SERVO_ANGLE = 180;
-        private int handBlackX, handBlackY;                          // black & green hand
-        private int[] handGreenX = new int[LIM], handGreenY = new int[LIM], handDegGreen = new int[LIM];
+        //private int[] handGreenX = new int[LIM], handGreenY = new int[LIM], handDegGreen = new int[LIM];
+        //private int[] handRedX = new int[LIM], handRedY = new int[LIM];
         private int circleX, circleY;                                // center of the circle
         private int handStartAngle = -90;
+        private int handIndex = 0;
+        private Point[] linesArray = new Point[3 * LIM];
 
         private bool left_to_right = true;
         // radar drawing
         private Bitmap bmp;
-        private Pen pen;
-        private Pen[] penGreen = new Pen[LIM];
+        private Pen pen = new Pen(Color.Green, 2.5f);
+        private Pen[] penGreenList = new Pen[LIM];
+        private Pen[] penRedList = new Pen[LIM];
         private Graphics graphics;
-        private static double hue = Color.Green.GetHue();
-        private static double saturation = Color.Green.GetSaturation();
-        private static double brightness = Color.Green.GetBrightness();
-        private Color[] colorList = new Color[LIM];
+        private static double greenHue = Color.Green.GetHue();
+        private static double greenSaturation = Color.Green.GetSaturation();
+        private static double greenBrightness = Color.Green.GetBrightness();
+        private Color[] greenColorList = new Color[LIM];
+        private static double redHue = Color.Red.GetHue();
+        private static double redSaturation = Color.Red.GetSaturation();
+        private static double redBrightness = Color.Red.GetBrightness();
+        private Color[] redColorList = new Color[LIM];
 
 
         /*
@@ -96,6 +107,9 @@ namespace TerminalProject
             // List View Initialization
             initializeFilesListView();
 
+            // Set Default Masked Distance
+            maskedDistanceTextBox.Text = maskedDistance.ToString();
+
         } // END MainForm
 
         /*
@@ -120,154 +134,127 @@ namespace TerminalProject
             //initial degree of HAND
             handDegMain = handStartAngle;
 
+            for (int i = 0; i < LIM-1; i++) {
+                greenColorList[i] = ColorFromHSV(greenHue, greenSaturation, (1 - greenBrightness) / (LIM - 1) * i);
+                redColorList[i] = ColorFromHSV(redHue, redSaturation, (1 - redBrightness) / (LIM - 1) * i);
+            }
+            greenColorList[0] = Color.Green;
+            greenColorList[LIM - 1] = Color.Black;
+
+            redColorList[0] = Color.Red;
+            redColorList[LIM - 1] = Color.Black;
+
             for (int i = 0; i < LIM; i++)
-                colorList[i] = ColorFromHSV(hue, saturation, brightness + (1- brightness)/LIM * i);
+            {
+                penGreenList[i] = new Pen(greenColorList[i], 2.5f);
+                penRedList[i] = new Pen(redColorList[i], 2.5f);
+            }
+
 
             //timer
-            t.Interval = 20; //in millisecond
-            t.Tick += new EventHandler(this.t_Tick);
+            t.Interval = 50; //in millisecond
+           // t.Tick += new EventHandler(this.t_Tick);
 
         }
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////           Main Methods
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-       /*
-        * Tick Tock Radar 
-        */ 
-        private void t_Tick(object sender, EventArgs e)
+        /*
+         * Radar Visualisation 
+         */
+        private void RadarVisualisation(int deg, float dist)
         {
-            //pen
-            pen = new Pen(Color.Green, 1f);
-            for (int i = 0; i < LIM; i++)
-                penGreen[i] =  new Pen(colorList[i], 1f);
-            
+            // Convert deg to range [-90,90]
+            handDegMain = -(deg - 90);
+            // Convert dist relative to HAND & maskedDistance
+            maskedDistance = float.Parse(maskedDistanceTextBox.Text);
+            float adjustedDist = dist > maskedDistance ?
+                                        HAND : (dist * HAND) / maskedDistance;
 
-            //graphics
-            graphics = Graphics.FromImage(bmp);
-
-            angleLabel.Text = "Angle: " + (handDegMain + 90);
-
-            //calculate x, y coordinate of HAND
-            if (left_to_right)
-            {
-                handDegBlack = handDegMain - LIM;
-                for(int i = LIM-1 ; i > 0 ; i--)
-                    handDegGreen[i] = handDegMain - LIM + i+1;
-            }
-            else
-            {
-                handDegBlack = handDegMain + LIM;
-                for (int i = LIM - 1; i > 0; i--)
-                    handDegGreen[i] = handDegMain + LIM - i-1;
-            }
-
-            // swipe hand back and forth
-            if (handDegMain == 90)
-                left_to_right = false;
-            else if(handDegMain == -90)
-                left_to_right = true;
-
-            // MAIN HAND
-            if (handDegMain >= 0 && handDegMain <= MAX_SERVO_ANGLE)
+       
+            if (handDegMain >= 0 && handDegMain <= 90)
             {
                 // right half
-                // u in degree is converted into radian.
-
-                handMainX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegMain / 180));
-                handMainY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
+                // degree is converted into radian
+                handGreenX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegMain / 180));
+                handGreenY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
+                // Red Hand
+                handRedX = circleX + (int)(adjustedDist * Math.Sin(Math.PI * handDegMain / 180));
+                handRedY = circleY - (int)(adjustedDist * Math.Cos(Math.PI * handDegMain / 180));
             }
             else
             {
                 // left half
-                handMainX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegMain / 180));
-                handMainY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
-            }
-            // BLACK HAND
-            if (handDegBlack >= 0 && handDegBlack <= MAX_SERVO_ANGLE)
-            {
-                //right half
-                //degree is converted into radian.
-
-                handBlackX = circleX + (int)(HAND * Math.Sin(Math.PI * handDegBlack / 180));
-                handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
-            }
-            else
-            {
-                handBlackX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegBlack / 180));
-                handBlackY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegBlack / 180));
+                handGreenX = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegMain / 180));
+                handGreenY = circleY - (int)(HAND * Math.Cos(Math.PI * handDegMain / 180));
+                // Red Hand
+                handRedX = circleX - (int)(adjustedDist * -Math.Sin(Math.PI * handDegMain / 180));
+                handRedY = circleY - (int)(adjustedDist * Math.Cos(Math.PI * handDegMain / 180));
             }
 
-            // GREEN 2 HAND
-            for (int i = 0; i < LIM; i++)
-            {
-                if (handDegGreen[i] >= 0 && handDegGreen[i] <= MAX_SERVO_ANGLE)
-                {
-                    //right half
-                    //degree is converted into radian.
-
-                    handGreenX[i] = circleX + (int)(HAND * Math.Sin(Math.PI * handDegGreen[i] / 180));
-                    handGreenY[i] = circleY - (int)(HAND * Math.Cos(Math.PI * handDegGreen[i] / 180));
-
-                }
-                else
-                {
-
-                    handGreenX[i] = circleX - (int)(HAND * -Math.Sin(Math.PI * handDegGreen[i] / 180));
-                    handGreenY[i] = circleY - (int)(HAND * Math.Cos(Math.PI * handDegGreen[i] / 180));
-
-                }
-            }
-
-            //////////////////////////////
-            //       Draw Radar 
             /////////////////////////////
+            //      Draw Radar
+            ////////////////////////////
+            //graphics
+            graphics = Graphics.FromImage(bmp);
 
             // draw circles
-            for (int i = 50 ; i < HAND ; i += 100)
+            for (int i = 50; i < HAND; i += 100)
             {
                 int radius = HAND - i;
-                graphics.DrawEllipse(pen, circleX - radius, circleY - radius, radius * 2, radius * 2);  
+                graphics.DrawEllipse(pen, circleX - radius, circleY - radius, radius * 2, radius * 2);
             }
 
             //draw perpendicular line
-            graphics.DrawLine(pen, new Point(circleX, 0), new Point(circleX, HEIGHT)); // UP-DOWN
+            graphics.DrawLine(pen, new Point(circleX, circleY), new Point(circleX, HEIGHT)); // UP-DOWN
             // draw angled lines
             for (int ang = 30; ang < MAX_SERVO_ANGLE; ang += 30)
             {
                 Point p_end = new Point(circleX - (int)(HAND * Math.Cos(ang * Math.PI / 180)), circleY - (int)(HAND * Math.Sin(ang * Math.PI / 180)));
-                graphics.DrawLine(pen, new Point(circleX, HEIGHT), p_end);
+                graphics.DrawLine(pen, new Point(circleX, circleY), p_end);
             }
+            //////////////////
+            //   Draw HAND
+            //////////////////
 
-            //draw HAND
-            graphics.DrawLine(pen, new Point(circleX, circleY), new Point(handMainX, handMainY));
-            for (int i = 0; i < LIM; i++)
+            Point start_p  = new Point(circleX, circleY);
+            Point middle_p = new Point(handGreenX, handGreenY);
+            Point end_p    = new Point(handRedX, handRedY);
+
+            // Shift Lines
+            for (int i = 0; i < linesArray.Length - 3; i += 3)
             {
-                graphics.DrawLine(penGreen[i], new Point(circleX, circleY), new Point(handGreenX[i], handGreenY[i]));
-                penGreen[i].Dispose();
+                if (linesArray[i].IsEmpty)
+                    break;
+                linesArray[i + 3] = linesArray[i];
+                linesArray[i + 4] = linesArray[i + 1];
+                linesArray[i + 5] = linesArray[i + 2];
             }
-            graphics.DrawLine(new Pen(Color.Black, 1f), new Point(circleX, circleY), new Point(handBlackX, handBlackY));
+            // insert new line
+            linesArray[0] = start_p;
+            linesArray[1] = middle_p;
+            linesArray[2] = end_p;
 
+            // Draw Lines
+            for (int i = 0; i < linesArray.Length; i += 3)
+            {
+                if (linesArray[i].IsEmpty)
+                    break;
+                graphics.DrawLine(penGreenList[i/3], linesArray[i], linesArray[i+1]);
+                graphics.DrawLine(penRedList[i/3], linesArray[i+1], linesArray[i+2]);
+            }
+
+            graphics.Dispose();
             //load bitmap in picturebox1
             radarPictureBox.Image = bmp;
 
-            //dispose
-            pen.Dispose();
-            graphics.Dispose();
+        } // END RadarVisualisation
 
-            //update
-            if(left_to_right)
-                handDegMain++;
-            else
-                handDegMain--;
-
-            if (handDegMain == MAX_SERVO_ANGLE)
-            {
-                handDegMain = handStartAngle;
-            }
-        } // ens tick-tock radar
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /*
          * Listens to UART interrupts
@@ -336,12 +323,19 @@ namespace TerminalProject
                 // Recieve Scanner info
                 case CustomSerialPort.Type.SCAN:
                     int deg = int.Parse(val.Substring(0, 3));
-                    float dist = float.Parse(val.Substring(3));
+                    int tpmDiff = int.Parse(val.Substring(3));
+                    // time diff: 1 / (24M/8)  | 24MHz = tpm clk , 8 = tpm prescaler
+                    // float tpmTimeDiff = (float)tpmDiff / (float) 3000000; 
+                    // float dist = tpmTimeDiff * 17000;
+                    float dist = (float)tpmDiff / (float)176.4705882;
                     Console.WriteLine("scan: deg- " + deg + " dist- " + dist + " cm");
                     this.Invoke((MethodInvoker)delegate
                     {
-                        angleLabel.Text = deg.ToString();
-                        distanceLabel.Text = dist.ToString();
+                        if(!scanMode)
+                            scanButton_Click(this,EventArgs.Empty);
+                        RadarVisualisation(deg, dist);
+                        angleLabel.Text = "Angle: " + (handDegMain + 90);
+                        distanceLabel.Text = "Distance: " + dist.ToString("#.##");
                     });
                     break;
 
@@ -350,7 +344,7 @@ namespace TerminalProject
                     Console.WriteLine("Telemetria: Distance- " + val);
                     this.Invoke((MethodInvoker)delegate
                     {
-                        telemetriaDistanceLabel.Text = val.ToString();
+                        telemetriaDistanceLabel.Text = "Distance: " + val.ToString() + "cm";
                     });
                     break;
 
@@ -657,6 +651,8 @@ namespace TerminalProject
                 deg90Label.Visible = false;
                 deg120Label.Visible = false;
                 deg150Label.Visible = false;
+                // Telemetria On
+                maskedDistancePanel.Visible = true;
                 telemetriaButton.Visible = true;
                 telemetriaDataTextBox.Visible = true;
                 telemetriaLabel.Visible = true;
@@ -669,6 +665,7 @@ namespace TerminalProject
             else // start scanning
             {
                 scanMode = true;
+                maskedDistance = float.Parse(maskedDistanceTextBox.Text);
                 scanButton.Text = "Stop Scan";
                 radarPictureBox.Visible = true;
                 radarTextPanel.Visible = true;
@@ -677,6 +674,8 @@ namespace TerminalProject
                 deg90Label.Visible = true;
                 deg120Label.Visible = true;
                 deg150Label.Visible = true;
+                // Telemetria Off
+                maskedDistancePanel.Visible = false;
                 telemetriaButton.Visible = false;
                 telemetriaDataTextBox.Visible = false;
                 telemetriaLabel.Visible = false;

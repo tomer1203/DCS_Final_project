@@ -105,8 +105,8 @@ void rad_detect_sys(){
 	enable_sensor(TRUE);
 	while (1){
 		WriteServo(degree);
-		degree+=9;
-		if (degree == 189){
+		degree += SERVO_DEG_CHANGE;
+		if (degree > 180){
 			degree = 0;
 		}
 		while(!distance_ready){
@@ -135,7 +135,7 @@ void rad_detect_sys(){
 			enable_sensor(FALSE);
 			return;
 		}
-		WaitDelay(50);
+		WaitDelay(200);//50
 	}
 }
 void telemeter_system(){

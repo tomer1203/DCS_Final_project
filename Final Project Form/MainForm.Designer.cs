@@ -37,6 +37,10 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.statusLabel = new System.Windows.Forms.Label();
             this.radarPanel = new System.Windows.Forms.Panel();
+            this.maskedDistancePanel = new System.Windows.Forms.Panel();
+            this.cmLabel = new System.Windows.Forms.Label();
+            this.maskedDistanceTextBox = new System.Windows.Forms.TextBox();
+            this.maskDistanceLabel = new System.Windows.Forms.Label();
             this.deg150Label = new System.Windows.Forms.Label();
             this.deg120Label = new System.Windows.Forms.Label();
             this.deg90Label = new System.Windows.Forms.Label();
@@ -68,9 +72,11 @@
             this.connectingPictureBox = new System.Windows.Forms.PictureBox();
             this.configurationsLabel = new System.Windows.Forms.Label();
             this.settingsPanel = new System.Windows.Forms.Panel();
+            this.cmRadarPanelLabel = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.radarPanel.SuspendLayout();
+            this.maskedDistancePanel.SuspendLayout();
             this.telemetriaPanel.SuspendLayout();
             this.radarTextPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radarPictureBox)).BeginInit();
@@ -144,6 +150,7 @@
             // radarPanel
             // 
             this.radarPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarPanel.Controls.Add(this.maskedDistancePanel);
             this.radarPanel.Controls.Add(this.deg150Label);
             this.radarPanel.Controls.Add(this.deg120Label);
             this.radarPanel.Controls.Add(this.deg90Label);
@@ -161,6 +168,44 @@
             this.radarPanel.Name = "radarPanel";
             this.radarPanel.Size = new System.Drawing.Size(971, 544);
             this.radarPanel.TabIndex = 2;
+            // 
+            // maskedDistancePanel
+            // 
+            this.maskedDistancePanel.Controls.Add(this.cmLabel);
+            this.maskedDistancePanel.Controls.Add(this.maskedDistanceTextBox);
+            this.maskedDistancePanel.Controls.Add(this.maskDistanceLabel);
+            this.maskedDistancePanel.Location = new System.Drawing.Point(41, 466);
+            this.maskedDistancePanel.Name = "maskedDistancePanel";
+            this.maskedDistancePanel.Size = new System.Drawing.Size(315, 55);
+            this.maskedDistancePanel.TabIndex = 12;
+            // 
+            // cmLabel
+            // 
+            this.cmLabel.AutoSize = true;
+            this.cmLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.cmLabel.Location = new System.Drawing.Point(277, 26);
+            this.cmLabel.Name = "cmLabel";
+            this.cmLabel.Size = new System.Drawing.Size(30, 20);
+            this.cmLabel.TabIndex = 2;
+            this.cmLabel.Text = "cm";
+            // 
+            // maskedDistanceTextBox
+            // 
+            this.maskedDistanceTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.maskedDistanceTextBox.Location = new System.Drawing.Point(181, 16);
+            this.maskedDistanceTextBox.Name = "maskedDistanceTextBox";
+            this.maskedDistanceTextBox.Size = new System.Drawing.Size(90, 30);
+            this.maskedDistanceTextBox.TabIndex = 1;
+            // 
+            // maskDistanceLabel
+            // 
+            this.maskDistanceLabel.AutoSize = true;
+            this.maskDistanceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.maskDistanceLabel.Location = new System.Drawing.Point(7, 19);
+            this.maskDistanceLabel.Name = "maskDistanceLabel";
+            this.maskDistanceLabel.Size = new System.Drawing.Size(169, 25);
+            this.maskDistanceLabel.TabIndex = 0;
+            this.maskDistanceLabel.Text = "Masked Distance:";
             // 
             // deg150Label
             // 
@@ -272,11 +317,12 @@
             // radarTextPanel
             // 
             this.radarTextPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarTextPanel.Controls.Add(this.cmRadarPanelLabel);
             this.radarTextPanel.Controls.Add(this.angleLabel);
             this.radarTextPanel.Controls.Add(this.distanceLabel);
-            this.radarTextPanel.Location = new System.Drawing.Point(791, 14);
+            this.radarTextPanel.Location = new System.Drawing.Point(752, 14);
             this.radarTextPanel.Name = "radarTextPanel";
-            this.radarTextPanel.Size = new System.Drawing.Size(163, 77);
+            this.radarTextPanel.Size = new System.Drawing.Size(214, 77);
             this.radarTextPanel.TabIndex = 1;
             // 
             // angleLabel
@@ -511,6 +557,17 @@
             this.settingsPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
             this.settingsPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
+            // cmRadarPanelLabel
+            // 
+            this.cmRadarPanelLabel.AutoSize = true;
+            this.cmRadarPanelLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.cmRadarPanelLabel.ForeColor = System.Drawing.Color.Green;
+            this.cmRadarPanelLabel.Location = new System.Drawing.Point(179, 15);
+            this.cmRadarPanelLabel.Name = "cmRadarPanelLabel";
+            this.cmRadarPanelLabel.Size = new System.Drawing.Size(32, 20);
+            this.cmRadarPanelLabel.TabIndex = 2;
+            this.cmRadarPanelLabel.Text = "cm";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -531,6 +588,8 @@
             this.tabPage1.ResumeLayout(false);
             this.radarPanel.ResumeLayout(false);
             this.radarPanel.PerformLayout();
+            this.maskedDistancePanel.ResumeLayout(false);
+            this.maskedDistancePanel.PerformLayout();
             this.telemetriaPanel.ResumeLayout(false);
             this.telemetriaPanel.PerformLayout();
             this.radarTextPanel.ResumeLayout(false);
@@ -589,6 +648,11 @@
         private System.Windows.Forms.Label deg30Label;
         private System.Windows.Forms.Label deg150Label;
         private System.Windows.Forms.Label deg120Label;
+        private System.Windows.Forms.Panel maskedDistancePanel;
+        private System.Windows.Forms.Label cmLabel;
+        private System.Windows.Forms.TextBox maskedDistanceTextBox;
+        private System.Windows.Forms.Label maskDistanceLabel;
+        private System.Windows.Forms.Label cmRadarPanelLabel;
     }
 }
 
