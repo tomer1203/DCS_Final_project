@@ -19,7 +19,7 @@
 #define TPM_DC_VAL_MIN 900//3276 //  5% * 20ms = 1ms 
 #define TPM_DC_VAL_MAX 3750//1875//6554 // 10% * 20ms = 2ms
 
-#define SERVO_DEG_CHANGE 3
+#define SERVO_DEG_CHANGE 1
 
 void InitServo();
 void InitSensors();

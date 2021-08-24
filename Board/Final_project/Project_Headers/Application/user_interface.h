@@ -7,9 +7,11 @@
 
 #ifndef USER_INTERFACE_H_
 #define USER_INTERFACE_H_
+
 #define MAX_SUBMENUS  20
-#define MAX_TITLE      17
+#define MAX_TITLE 17
 #define CONFIGURATION_MENU_SIZE 2
+#define SCAN_DELAY 50
 
 typedef struct Menu{
 	char       title[MAX_TITLE];

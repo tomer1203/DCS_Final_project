@@ -1,5 +1,6 @@
 #include "TFC.h"
 
+
 //////////////////////////////////
 //	Inits Servo
 /////////////////////////////////
@@ -8,6 +9,9 @@ void InitServo(){
 	InitTPMx(SERVO_TPM);		 // configure pit 0
 	StartTPMx(SERVO_TPM, 1); // start pit 
 }
+/////////////////////////////////////
+//  Inits Sensors
+/////////////////////////////////////
 void InitSensors(){
 	ClockSetupTPM(); // initialise tpm clock
 	InitTPMx(SENSOR_TRIG);

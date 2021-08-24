@@ -41,12 +41,13 @@
             this.cmLabel = new System.Windows.Forms.Label();
             this.maskedDistanceTextBox = new System.Windows.Forms.TextBox();
             this.maskDistanceLabel = new System.Windows.Forms.Label();
-            this.deg150Label = new System.Windows.Forms.Label();
-            this.deg120Label = new System.Windows.Forms.Label();
-            this.deg90Label = new System.Windows.Forms.Label();
-            this.deg60Label = new System.Windows.Forms.Label();
             this.deg30Label = new System.Windows.Forms.Label();
+            this.deg60Label = new System.Windows.Forms.Label();
+            this.deg90Label = new System.Windows.Forms.Label();
+            this.deg120Label = new System.Windows.Forms.Label();
+            this.deg150Label = new System.Windows.Forms.Label();
             this.telemetriaPanel = new System.Windows.Forms.Panel();
+            this.telemetriaCmLabel = new System.Windows.Forms.Label();
             this.telemetriaAngleLabel = new System.Windows.Forms.Label();
             this.telemetriaDistanceLabel = new System.Windows.Forms.Label();
             this.telemetriaLabel = new System.Windows.Forms.Label();
@@ -73,7 +74,7 @@
             this.connectingPictureBox = new System.Windows.Forms.PictureBox();
             this.configurationsLabel = new System.Windows.Forms.Label();
             this.settingsPanel = new System.Windows.Forms.Panel();
-            this.telemetriaCmLabel = new System.Windows.Forms.Label();
+            this.stopTelemetriaButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.radarPanel.SuspendLayout();
@@ -151,12 +152,13 @@
             // radarPanel
             // 
             this.radarPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarPanel.Controls.Add(this.stopTelemetriaButton);
             this.radarPanel.Controls.Add(this.maskedDistancePanel);
-            this.radarPanel.Controls.Add(this.deg150Label);
-            this.radarPanel.Controls.Add(this.deg120Label);
-            this.radarPanel.Controls.Add(this.deg90Label);
-            this.radarPanel.Controls.Add(this.deg60Label);
             this.radarPanel.Controls.Add(this.deg30Label);
+            this.radarPanel.Controls.Add(this.deg60Label);
+            this.radarPanel.Controls.Add(this.deg90Label);
+            this.radarPanel.Controls.Add(this.deg120Label);
+            this.radarPanel.Controls.Add(this.deg150Label);
             this.radarPanel.Controls.Add(this.telemetriaPanel);
             this.radarPanel.Controls.Add(this.telemetriaLabel);
             this.radarPanel.Controls.Add(this.scanButton);
@@ -208,27 +210,27 @@
             this.maskDistanceLabel.TabIndex = 0;
             this.maskDistanceLabel.Text = "Masked Distance:";
             // 
-            // deg150Label
+            // deg30Label
             // 
-            this.deg150Label.AutoSize = true;
-            this.deg150Label.ForeColor = System.Drawing.Color.Green;
-            this.deg150Label.Location = new System.Drawing.Point(890, 255);
-            this.deg150Label.Name = "deg150Label";
-            this.deg150Label.Size = new System.Drawing.Size(40, 20);
-            this.deg150Label.TabIndex = 11;
-            this.deg150Label.Text = "150 ";
-            this.deg150Label.Visible = false;
+            this.deg30Label.AutoSize = true;
+            this.deg30Label.ForeColor = System.Drawing.Color.Green;
+            this.deg30Label.Location = new System.Drawing.Point(890, 255);
+            this.deg30Label.Name = "deg30Label";
+            this.deg30Label.Size = new System.Drawing.Size(31, 20);
+            this.deg30Label.TabIndex = 11;
+            this.deg30Label.Text = "30 ";
+            this.deg30Label.Visible = false;
             // 
-            // deg120Label
+            // deg60Label
             // 
-            this.deg120Label.AutoSize = true;
-            this.deg120Label.ForeColor = System.Drawing.Color.Green;
-            this.deg120Label.Location = new System.Drawing.Point(715, 71);
-            this.deg120Label.Name = "deg120Label";
-            this.deg120Label.Size = new System.Drawing.Size(40, 20);
-            this.deg120Label.TabIndex = 10;
-            this.deg120Label.Text = "120 ";
-            this.deg120Label.Visible = false;
+            this.deg60Label.AutoSize = true;
+            this.deg60Label.ForeColor = System.Drawing.Color.Green;
+            this.deg60Label.Location = new System.Drawing.Point(715, 71);
+            this.deg60Label.Name = "deg60Label";
+            this.deg60Label.Size = new System.Drawing.Size(27, 20);
+            this.deg60Label.TabIndex = 10;
+            this.deg60Label.Text = "60";
+            this.deg60Label.Visible = false;
             // 
             // deg90Label
             // 
@@ -241,27 +243,27 @@
             this.deg90Label.Text = "90 ";
             this.deg90Label.Visible = false;
             // 
-            // deg60Label
+            // deg120Label
             // 
-            this.deg60Label.AutoSize = true;
-            this.deg60Label.ForeColor = System.Drawing.Color.Green;
-            this.deg60Label.Location = new System.Drawing.Point(219, 71);
-            this.deg60Label.Name = "deg60Label";
-            this.deg60Label.Size = new System.Drawing.Size(31, 20);
-            this.deg60Label.TabIndex = 8;
-            this.deg60Label.Text = "60 ";
-            this.deg60Label.Visible = false;
+            this.deg120Label.AutoSize = true;
+            this.deg120Label.ForeColor = System.Drawing.Color.Green;
+            this.deg120Label.Location = new System.Drawing.Point(219, 71);
+            this.deg120Label.Name = "deg120Label";
+            this.deg120Label.Size = new System.Drawing.Size(36, 20);
+            this.deg120Label.TabIndex = 8;
+            this.deg120Label.Text = "120";
+            this.deg120Label.Visible = false;
             // 
-            // deg30Label
+            // deg150Label
             // 
-            this.deg30Label.AutoSize = true;
-            this.deg30Label.ForeColor = System.Drawing.Color.Green;
-            this.deg30Label.Location = new System.Drawing.Point(37, 255);
-            this.deg30Label.Name = "deg30Label";
-            this.deg30Label.Size = new System.Drawing.Size(31, 20);
-            this.deg30Label.TabIndex = 7;
-            this.deg30Label.Text = "30 ";
-            this.deg30Label.Visible = false;
+            this.deg150Label.AutoSize = true;
+            this.deg150Label.ForeColor = System.Drawing.Color.Green;
+            this.deg150Label.Location = new System.Drawing.Point(37, 255);
+            this.deg150Label.Name = "deg150Label";
+            this.deg150Label.Size = new System.Drawing.Size(36, 20);
+            this.deg150Label.TabIndex = 7;
+            this.deg150Label.Text = "150";
+            this.deg150Label.Visible = false;
             // 
             // telemetriaPanel
             // 
@@ -272,6 +274,17 @@
             this.telemetriaPanel.Name = "telemetriaPanel";
             this.telemetriaPanel.Size = new System.Drawing.Size(705, 67);
             this.telemetriaPanel.TabIndex = 6;
+            // 
+            // telemetriaCmLabel
+            // 
+            this.telemetriaCmLabel.AutoSize = true;
+            this.telemetriaCmLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaCmLabel.Location = new System.Drawing.Point(322, 23);
+            this.telemetriaCmLabel.Name = "telemetriaCmLabel";
+            this.telemetriaCmLabel.Size = new System.Drawing.Size(40, 25);
+            this.telemetriaCmLabel.TabIndex = 6;
+            this.telemetriaCmLabel.Text = "cm";
+            this.telemetriaCmLabel.Visible = false;
             // 
             // telemetriaAngleLabel
             // 
@@ -570,16 +583,19 @@
             this.settingsPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
             this.settingsPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
-            // telemetriaCmLabel
+            // stopTelemetriaButton
             // 
-            this.telemetriaCmLabel.AutoSize = true;
-            this.telemetriaCmLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.telemetriaCmLabel.Location = new System.Drawing.Point(322, 23);
-            this.telemetriaCmLabel.Name = "telemetriaCmLabel";
-            this.telemetriaCmLabel.Size = new System.Drawing.Size(40, 25);
-            this.telemetriaCmLabel.TabIndex = 6;
-            this.telemetriaCmLabel.Text = "cm";
-            this.telemetriaCmLabel.Visible = false;
+            this.stopTelemetriaButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.stopTelemetriaButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.stopTelemetriaButton.ForeColor = System.Drawing.Color.Teal;
+            this.stopTelemetriaButton.Location = new System.Drawing.Point(876, 108);
+            this.stopTelemetriaButton.Name = "stopTelemetriaButton";
+            this.stopTelemetriaButton.Size = new System.Drawing.Size(61, 36);
+            this.stopTelemetriaButton.TabIndex = 13;
+            this.stopTelemetriaButton.Text = "Stop";
+            this.stopTelemetriaButton.UseVisualStyleBackColor = true;
+            this.stopTelemetriaButton.Visible = false;
+            this.stopTelemetriaButton.Click += new System.EventHandler(this.stopTelemetriaButton_Click);
             // 
             // MainForm
             // 
@@ -657,16 +673,17 @@
         private System.Windows.Forms.Label telemetriaAngleLabel;
         private System.Windows.Forms.Label telemetriaDistanceLabel;
         private System.Windows.Forms.Label deg90Label;
-        private System.Windows.Forms.Label deg60Label;
-        private System.Windows.Forms.Label deg30Label;
-        private System.Windows.Forms.Label deg150Label;
         private System.Windows.Forms.Label deg120Label;
+        private System.Windows.Forms.Label deg150Label;
+        private System.Windows.Forms.Label deg30Label;
+        private System.Windows.Forms.Label deg60Label;
         private System.Windows.Forms.Panel maskedDistancePanel;
         private System.Windows.Forms.Label cmLabel;
         private System.Windows.Forms.TextBox maskedDistanceTextBox;
         private System.Windows.Forms.Label maskDistanceLabel;
         private System.Windows.Forms.Label cmRadarPanelLabel;
         private System.Windows.Forms.Label telemetriaCmLabel;
+        private System.Windows.Forms.Button stopTelemetriaButton;
     }
 }
 

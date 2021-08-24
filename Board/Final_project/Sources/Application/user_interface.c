@@ -138,7 +138,7 @@ StateModes rad_detect_sys(){
 			enable_sensor(FALSE);
 			return state;
 		}
-		WaitDelay(200);//50
+		WaitDelay(SCAN_DELAY);
 	}
 }
 StateModes telemeter_system(){

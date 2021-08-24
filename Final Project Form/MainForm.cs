@@ -47,16 +47,15 @@ namespace TerminalProject
         private int WIDTH, HEIGHT, HAND;
         private int handDegMain;                                     // in degree
         private int handGreenX, handGreenY, handRedX, handRedY;      // HAND coordinate
-        private const int LIM = 5, MAX_SERVO_ANGLE = 180;
+        private const int LIM = 30, MAX_SERVO_ANGLE = 180;
         private int circleX, circleY;                                // center of the circle
-        private int handStartAngle = -90;
         private Point[] linesArray = new Point[3 * LIM];
 
         // radar drawing
         private Bitmap bmp;
         private Pen pen = new Pen(Color.Green, 2.5f);
-        private Pen[] penGreenList = new Pen[LIM];
-        private Pen[] penRedList = new Pen[LIM];
+        private Pen[] penGreenList;
+        private Pen[] penRedList;
         private Graphics graphics;
         private static double greenHue = Color.Green.GetHue();
         private static double greenSaturation = Color.Green.GetSaturation();
@@ -127,28 +126,14 @@ namespace TerminalProject
             circleX = radarPanel.Width / 2  + 55;
             circleY = radarPanel.Height;
 
-            //initial degree of HAND
-            handDegMain = handStartAngle;
-
             for (int i = 0; i < LIM-1; i++) {
-                greenColorList[i] = ColorFromHSV(greenHue, greenSaturation, (1 - greenBrightness) / (LIM - 1) * i);
-                redColorList[i] = ColorFromHSV(redHue, redSaturation, (1 - redBrightness) / (LIM - 1) * i);
+                greenColorList[i] = ColorFromHSV(greenHue, greenSaturation, greenBrightness - (greenBrightness * i / (LIM - 1)) );
+                redColorList[i] = ColorFromHSV(redHue, redSaturation, redBrightness - (redBrightness * i / (LIM - 1)) );
             }
             greenColorList[0] = Color.Green;
             greenColorList[LIM - 1] = Color.Black;
             redColorList[0] = Color.Red;
             redColorList[LIM - 1] = Color.Black;
-
-            for (int i = 0; i < LIM; i++)
-            {
-                penGreenList[i] = new Pen(greenColorList[i], 2.5f);
-                penRedList[i] = new Pen(redColorList[i], 2.5f);
-            }
-
-
-            //timer
-            t.Interval = 50; //in millisecond
-           // t.Tick += new EventHandler(this.t_Tick);
 
         }
 
@@ -168,7 +153,16 @@ namespace TerminalProject
             float adjustedDist = dist > maskedDistance ?
                                         HAND : (dist * HAND) / maskedDistance;
 
-       
+            // Initiallize Pens
+            penGreenList = new Pen[LIM];
+            penRedList = new Pen[LIM];
+            for (int i = 0; i < LIM; i++)
+            {
+                penGreenList[i] = new Pen(greenColorList[i], 2.5f);
+                penRedList[i] = new Pen(redColorList[i], 2.5f);
+            }
+
+
             if (handDegMain >= 0 && handDegMain <= 90)
             {
                 // right half
@@ -219,13 +213,23 @@ namespace TerminalProject
             Point end_p    = new Point(handRedX, handRedY);
 
             // Shift Lines
-            for (int i = linesArray.Length - 1 ; i > 0 ; i -= 3)
+            Point temp0 ,temp1,temp2;
+
+            for (int i = 0 ; i < linesArray.Length - 6; i += 6)
             {
-                if (linesArray[i].IsEmpty)
+                if (linesArray[i].IsEmpty && linesArray[i+3].IsEmpty)
                     break;
-                linesArray[i] = linesArray[i - 3];
-                linesArray[i - 1] = linesArray[i - 4];
-                linesArray[i - 2] = linesArray[i - 5];
+
+                temp0 = linesArray[i + 3];
+                temp1 = linesArray[i + 4];
+                temp2 = linesArray[i + 5];
+                linesArray[i + 3] = linesArray[i];
+                linesArray[i + 4] = linesArray[i + 1];
+                linesArray[i + 5] = linesArray[i + 2];
+                linesArray[i + 6] = temp0;
+                linesArray[i + 7] = temp1;
+                linesArray[i + 8] = temp2;
+
             }
             // insert new line
             linesArray[0] = start_p;
@@ -233,12 +237,14 @@ namespace TerminalProject
             linesArray[2] = end_p;
 
             // Draw Lines
-            for (int i = 0; i < linesArray.Length; i += 3)
+            for (int i = 0 ; i < linesArray.Length ; i += 3)
             {
                 if (linesArray[i].IsEmpty)
                     break;
                 graphics.DrawLine(penGreenList[i/3], linesArray[i], linesArray[i+1]);
                 graphics.DrawLine(penRedList[i/3], linesArray[i+1], linesArray[i+2]);
+                penGreenList[i / 3].Dispose();
+                penRedList[i / 3].Dispose();
             }
 
             graphics.Dispose();
@@ -269,6 +275,7 @@ namespace TerminalProject
                 this.Invoke((MethodInvoker)delegate
                 {
                     setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR);
+                    Console.WriteLine("ERROR - DataRecievedHandler - Closing Port");
                 });
 
 
@@ -333,10 +340,19 @@ namespace TerminalProject
 
                 // Recieve Telemetria info
                 case CustomSerialPort.TYPE.TELMETERIA:
-                    Console.WriteLine("Telemetria: Distance- " + float.Parse(val) + "cm" );
+                    float distance = calcDistsnce(float.Parse(val)) > maskedDistance ?
+                        maskedDistance : calcDistsnce(float.Parse(val));
+                    Console.WriteLine("Telemetria: Distance- " + distance + "cm" );
+                    updateFileTransferStatusLabel("");
                     this.Invoke((MethodInvoker)delegate
                     {
-                        telemetriaDistanceLabel.Text = "Distance: " + calcDistsnce(float.Parse(val));
+                        if (scanMode)
+                            scanButton_Click(this, EventArgs.Empty);
+                        stopTelemetriaButton.Visible = true;
+                        scanButton.Visible = false;
+                        if (maskedDistanceTextBox.Text.Equals("")) return;
+                        maskedDistance = float.Parse(maskedDistanceTextBox.Text);
+                        telemetriaDistanceLabel.Text = "Distance: " + distance.ToString("#.##");
                         telemetriaCmLabel.Visible = true;
                     });
                     break;
@@ -469,7 +485,8 @@ namespace TerminalProject
                         CustomSerialPort.STATUS.bufferErrorCounter = 0;
                         this.Invoke((MethodInvoker)delegate
                         {
-                            setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR);
+                            Console.WriteLine("Buffer Error");
+                            setConnectingLabel(CustomSerialPort.STATUS.BUFFER_ERROR);
                         });
                     }
                     break;
@@ -501,6 +518,10 @@ namespace TerminalProject
                 case CustomSerialPort.STATUS.PORT_ERROR:
                     brush = Brushes.Red;
                     this.connectingLabel.Text = "Configure Serial Port";
+                    break;
+
+                    case CustomSerialPort.STATUS.BUFFER_ERROR:
+                    brush = Brushes.Orange;
                     break;
 
             }
@@ -544,7 +565,8 @@ namespace TerminalProject
         {
             if (keyEvent.KeyCode == Keys.Enter)
             {
-                if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage1"])
+                if (telemetriaDataTextBox.Focused) telemetriaButton_Click(sender, new EventArgs());
+                else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage1"])
                     scanButton_Click(sender, new EventArgs());
                 else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage2"])
                     sendFileButton_Click(sender, new EventArgs());
@@ -637,9 +659,12 @@ namespace TerminalProject
                     updateRadarStatusLabel("servo degree range error");
                     return;
                 }
+                telemetriaAngleLabel.Text = "Angle: " + telemetriaDataTextBox.Text;
                 serialPort.sendMessage(CustomSerialPort.TYPE.TELMETERIA, telemetriaDataTextBox.Text);
                 telemetriaDataTextBox.Text = "";
                 updateRadarStatusLabel("");
+                scanButton.Visible = false;
+                stopTelemetriaButton.Visible = true;
             }
             catch (Exception)
             {
@@ -659,11 +684,11 @@ namespace TerminalProject
                 scanButton.Text = "Start Scan";
                 radarPictureBox.Visible = false;
                 radarTextPanel.Visible = false;
-                deg30Label.Visible = false;
-                deg60Label.Visible = false;
-                deg90Label.Visible = false;
-                deg120Label.Visible = false;
                 deg150Label.Visible = false;
+                deg120Label.Visible = false;
+                deg90Label.Visible = false;
+                deg60Label.Visible = false;
+                deg30Label.Visible = false;
                 // Telemetria On
                 maskedDistancePanel.Visible = true;
                 telemetriaButton.Visible = true;
@@ -681,11 +706,11 @@ namespace TerminalProject
                 scanButton.Text = "Stop Scan";
                 radarPictureBox.Visible = true;
                 radarTextPanel.Visible = true;
-                deg30Label.Visible = true;
-                deg60Label.Visible = true;
-                deg90Label.Visible = true;
-                deg120Label.Visible = true;
                 deg150Label.Visible = true;
+                deg120Label.Visible = true;
+                deg90Label.Visible = true;
+                deg60Label.Visible = true;
+                deg30Label.Visible = true;
                 // Telemetria Off
                 maskedDistancePanel.Visible = false;
                 telemetriaButton.Visible = false;
@@ -728,20 +753,22 @@ namespace TerminalProject
 
 
         /*
-         * NFB Button click to send data using Write method
-         */
-        private void nonFormatButon_Click(object sender, EventArgs e)
+         * Stop Telemetria Button
+         */ 
+        private void stopTelemetriaButton_Click(object sender, EventArgs e)
         {
-            serialPort.Write(telemetriaDataTextBox.Text);
+            serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR,"");
+            stopTelemetriaButton.Visible = false;
+            scanButton.Visible = true;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //          Files Tab
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-       /*
-        * Updates File Transfer UI Labels
-        */
+        /*
+         * Updates File Transfer UI Labels
+         */
         public void updateFileTransferStatusLabel(string fileStatusLabelString)
         {
             this.Invoke((MethodInvoker)delegate
