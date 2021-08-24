@@ -9,7 +9,7 @@ using System.Threading;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
 
-namespace TerminalProject.Source_files
+namespace FinalProject.Source_files
 {
     public class CustomSerialPort : SerialPort
     {

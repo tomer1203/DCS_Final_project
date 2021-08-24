@@ -1,6 +1,6 @@
-﻿namespace TerminalProject
+﻿namespace FinalProject
 {
-    partial class ConfigurationsForm
+    partial class SerialConfigurationsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -41,7 +41,7 @@
             // setBaudrateLabel
             // 
             this.setBaudrateLabel.AutoSize = true;
-            this.setBaudrateLabel.Location = new System.Drawing.Point(25, 126);
+            this.setBaudrateLabel.Location = new System.Drawing.Point(55, 143);
             this.setBaudrateLabel.Name = "setBaudrateLabel";
             this.setBaudrateLabel.Size = new System.Drawing.Size(79, 20);
             this.setBaudrateLabel.TabIndex = 0;
@@ -50,7 +50,7 @@
             // setPortLabel
             // 
             this.setPortLabel.AutoSize = true;
-            this.setPortLabel.Location = new System.Drawing.Point(62, 88);
+            this.setPortLabel.Location = new System.Drawing.Point(92, 105);
             this.setPortLabel.Name = "setPortLabel";
             this.setPortLabel.Size = new System.Drawing.Size(42, 20);
             this.setPortLabel.TabIndex = 1;
@@ -59,10 +59,10 @@
             // configurationsTitle
             // 
             this.configurationsTitle.AutoSize = true;
-            this.configurationsTitle.Font = new System.Drawing.Font("Arial Narrow", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.configurationsTitle.Location = new System.Drawing.Point(12, 34);
+            this.configurationsTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.configurationsTitle.Location = new System.Drawing.Point(40, 39);
             this.configurationsTitle.Name = "configurationsTitle";
-            this.configurationsTitle.Size = new System.Drawing.Size(244, 24);
+            this.configurationsTitle.Size = new System.Drawing.Size(274, 25);
             this.configurationsTitle.TabIndex = 2;
             this.configurationsTitle.Text = "Set Serial Port Configurations:";
             // 
@@ -71,7 +71,7 @@
             this.setPortcomboBox.BackColor = System.Drawing.Color.WhiteSmoke;
             this.setPortcomboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.setPortcomboBox.FormattingEnabled = true;
-            this.setPortcomboBox.Location = new System.Drawing.Point(110, 82);
+            this.setPortcomboBox.Location = new System.Drawing.Point(140, 99);
             this.setPortcomboBox.Name = "setPortcomboBox";
             this.setPortcomboBox.Size = new System.Drawing.Size(121, 28);
             this.setPortcomboBox.TabIndex = 3;
@@ -80,7 +80,7 @@
             // 
             this.setBaudratecomboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.setBaudratecomboBox.FormattingEnabled = true;
-            this.setBaudratecomboBox.Location = new System.Drawing.Point(110, 123);
+            this.setBaudratecomboBox.Location = new System.Drawing.Point(140, 140);
             this.setBaudratecomboBox.Name = "setBaudratecomboBox";
             this.setBaudratecomboBox.Size = new System.Drawing.Size(121, 28);
             this.setBaudratecomboBox.TabIndex = 4;
@@ -90,7 +90,7 @@
             this.saveConfButton.BackColor = System.Drawing.SystemColors.MenuBar;
             this.saveConfButton.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.saveConfButton.ForeColor = System.Drawing.Color.Teal;
-            this.saveConfButton.Location = new System.Drawing.Point(90, 206);
+            this.saveConfButton.Location = new System.Drawing.Point(127, 257);
             this.saveConfButton.Name = "saveConfButton";
             this.saveConfButton.Size = new System.Drawing.Size(81, 35);
             this.saveConfButton.TabIndex = 5;
@@ -101,9 +101,9 @@
             // 
             this.saveConfErrorLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.saveConfErrorLabel.ForeColor = System.Drawing.Color.Tomato;
-            this.saveConfErrorLabel.Location = new System.Drawing.Point(0, 263);
+            this.saveConfErrorLabel.Location = new System.Drawing.Point(0, 325);
             this.saveConfErrorLabel.Name = "saveConfErrorLabel";
-            this.saveConfErrorLabel.Size = new System.Drawing.Size(274, 20);
+            this.saveConfErrorLabel.Size = new System.Drawing.Size(346, 20);
             this.saveConfErrorLabel.TabIndex = 7;
             this.saveConfErrorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -112,7 +112,7 @@
             this.sendToMcucheckBox.AutoSize = true;
             this.sendToMcucheckBox.Checked = true;
             this.sendToMcucheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.sendToMcucheckBox.Location = new System.Drawing.Point(66, 167);
+            this.sendToMcucheckBox.Location = new System.Drawing.Point(108, 196);
             this.sendToMcucheckBox.Name = "sendToMcucheckBox";
             this.sendToMcucheckBox.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.sendToMcucheckBox.Size = new System.Drawing.Size(128, 24);
@@ -120,12 +120,12 @@
             this.sendToMcucheckBox.Text = "send to MCU\r\n";
             this.sendToMcucheckBox.UseVisualStyleBackColor = true;
             // 
-            // ConfigurationsForm
+            // SerialConfigurationsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.MenuBar;
-            this.ClientSize = new System.Drawing.Size(274, 283);
+            this.ClientSize = new System.Drawing.Size(346, 345);
             this.Controls.Add(this.sendToMcucheckBox);
             this.Controls.Add(this.saveConfErrorLabel);
             this.Controls.Add(this.saveConfButton);
@@ -135,7 +135,7 @@
             this.Controls.Add(this.setPortLabel);
             this.Controls.Add(this.setBaudrateLabel);
             this.KeyPreview = true;
-            this.Name = "ConfigurationsForm";
+            this.Name = "SerialConfigurationsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Final Project";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.saveConfButton_KeyDown);

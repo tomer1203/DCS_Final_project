@@ -1,4 +1,4 @@
-﻿namespace TerminalProject
+﻿namespace FinalProject
 {
     partial class MainForm
     {
@@ -37,16 +37,14 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.statusLabel = new System.Windows.Forms.Label();
             this.radarPanel = new System.Windows.Forms.Panel();
-            this.maskedDistancePanel = new System.Windows.Forms.Panel();
-            this.cmLabel = new System.Windows.Forms.Label();
-            this.maskedDistanceTextBox = new System.Windows.Forms.TextBox();
-            this.maskDistanceLabel = new System.Windows.Forms.Label();
+            this.stopTelemetriaButton = new System.Windows.Forms.Button();
             this.deg30Label = new System.Windows.Forms.Label();
             this.deg60Label = new System.Windows.Forms.Label();
             this.deg90Label = new System.Windows.Forms.Label();
             this.deg120Label = new System.Windows.Forms.Label();
             this.deg150Label = new System.Windows.Forms.Label();
             this.telemetriaPanel = new System.Windows.Forms.Panel();
+            this.telemetriaOlLabel = new System.Windows.Forms.Label();
             this.telemetriaCmLabel = new System.Windows.Forms.Label();
             this.telemetriaAngleLabel = new System.Windows.Forms.Label();
             this.telemetriaDistanceLabel = new System.Windows.Forms.Label();
@@ -73,12 +71,17 @@
             this.connectingLabel = new System.Windows.Forms.Label();
             this.connectingPictureBox = new System.Windows.Forms.PictureBox();
             this.configurationsLabel = new System.Windows.Forms.Label();
-            this.settingsPanel = new System.Windows.Forms.Panel();
-            this.stopTelemetriaButton = new System.Windows.Forms.Button();
+            this.serialConfigurationPanel = new System.Windows.Forms.Panel();
+            this.filesConfigurationPanel = new System.Windows.Forms.Panel();
+            this.filesConfigurationsButton = new System.Windows.Forms.Label();
+            this.radarConfigurationPanel = new System.Windows.Forms.Panel();
+            this.radarConfigurationButton = new System.Windows.Forms.Label();
+            this.telemetriaEnterAngleLabel = new System.Windows.Forms.Label();
+            this.MDLabel = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.radarPanel.SuspendLayout();
-            this.maskedDistancePanel.SuspendLayout();
             this.telemetriaPanel.SuspendLayout();
             this.radarTextPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radarPictureBox)).BeginInit();
@@ -86,7 +89,9 @@
             this.fileNamePanel.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.connectingPictureBox)).BeginInit();
-            this.settingsPanel.SuspendLayout();
+            this.serialConfigurationPanel.SuspendLayout();
+            this.filesConfigurationPanel.SuspendLayout();
+            this.radarConfigurationPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // telemetriaButton
@@ -152,8 +157,8 @@
             // radarPanel
             // 
             this.radarPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarPanel.Controls.Add(this.telemetriaEnterAngleLabel);
             this.radarPanel.Controls.Add(this.stopTelemetriaButton);
-            this.radarPanel.Controls.Add(this.maskedDistancePanel);
             this.radarPanel.Controls.Add(this.deg30Label);
             this.radarPanel.Controls.Add(this.deg60Label);
             this.radarPanel.Controls.Add(this.deg90Label);
@@ -172,43 +177,19 @@
             this.radarPanel.Size = new System.Drawing.Size(971, 544);
             this.radarPanel.TabIndex = 2;
             // 
-            // maskedDistancePanel
+            // stopTelemetriaButton
             // 
-            this.maskedDistancePanel.Controls.Add(this.cmLabel);
-            this.maskedDistancePanel.Controls.Add(this.maskedDistanceTextBox);
-            this.maskedDistancePanel.Controls.Add(this.maskDistanceLabel);
-            this.maskedDistancePanel.Location = new System.Drawing.Point(41, 466);
-            this.maskedDistancePanel.Name = "maskedDistancePanel";
-            this.maskedDistancePanel.Size = new System.Drawing.Size(315, 55);
-            this.maskedDistancePanel.TabIndex = 12;
-            // 
-            // cmLabel
-            // 
-            this.cmLabel.AutoSize = true;
-            this.cmLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.cmLabel.Location = new System.Drawing.Point(277, 26);
-            this.cmLabel.Name = "cmLabel";
-            this.cmLabel.Size = new System.Drawing.Size(30, 20);
-            this.cmLabel.TabIndex = 2;
-            this.cmLabel.Text = "cm";
-            // 
-            // maskedDistanceTextBox
-            // 
-            this.maskedDistanceTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.maskedDistanceTextBox.Location = new System.Drawing.Point(181, 16);
-            this.maskedDistanceTextBox.Name = "maskedDistanceTextBox";
-            this.maskedDistanceTextBox.Size = new System.Drawing.Size(90, 30);
-            this.maskedDistanceTextBox.TabIndex = 1;
-            // 
-            // maskDistanceLabel
-            // 
-            this.maskDistanceLabel.AutoSize = true;
-            this.maskDistanceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.maskDistanceLabel.Location = new System.Drawing.Point(7, 19);
-            this.maskDistanceLabel.Name = "maskDistanceLabel";
-            this.maskDistanceLabel.Size = new System.Drawing.Size(169, 25);
-            this.maskDistanceLabel.TabIndex = 0;
-            this.maskDistanceLabel.Text = "Masked Distance:";
+            this.stopTelemetriaButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.stopTelemetriaButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.stopTelemetriaButton.ForeColor = System.Drawing.Color.Teal;
+            this.stopTelemetriaButton.Location = new System.Drawing.Point(876, 108);
+            this.stopTelemetriaButton.Name = "stopTelemetriaButton";
+            this.stopTelemetriaButton.Size = new System.Drawing.Size(61, 36);
+            this.stopTelemetriaButton.TabIndex = 13;
+            this.stopTelemetriaButton.Text = "Stop";
+            this.stopTelemetriaButton.UseVisualStyleBackColor = true;
+            this.stopTelemetriaButton.Visible = false;
+            this.stopTelemetriaButton.Click += new System.EventHandler(this.stopTelemetriaButton_Click);
             // 
             // deg30Label
             // 
@@ -267,13 +248,25 @@
             // 
             // telemetriaPanel
             // 
+            this.telemetriaPanel.Controls.Add(this.telemetriaOlLabel);
             this.telemetriaPanel.Controls.Add(this.telemetriaCmLabel);
             this.telemetriaPanel.Controls.Add(this.telemetriaAngleLabel);
             this.telemetriaPanel.Controls.Add(this.telemetriaDistanceLabel);
             this.telemetriaPanel.Location = new System.Drawing.Point(121, 226);
             this.telemetriaPanel.Name = "telemetriaPanel";
-            this.telemetriaPanel.Size = new System.Drawing.Size(705, 67);
+            this.telemetriaPanel.Size = new System.Drawing.Size(621, 67);
             this.telemetriaPanel.TabIndex = 6;
+            this.telemetriaPanel.Visible = false;
+            // 
+            // telemetriaOlLabel
+            // 
+            this.telemetriaOlLabel.AutoSize = true;
+            this.telemetriaOlLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaOlLabel.Location = new System.Drawing.Point(560, 11);
+            this.telemetriaOlLabel.Name = "telemetriaOlLabel";
+            this.telemetriaOlLabel.Size = new System.Drawing.Size(24, 25);
+            this.telemetriaOlLabel.TabIndex = 7;
+            this.telemetriaOlLabel.Text = "o\r\n";
             // 
             // telemetriaCmLabel
             // 
@@ -312,9 +305,9 @@
             this.telemetriaLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.telemetriaLabel.Location = new System.Drawing.Point(429, 25);
             this.telemetriaLabel.Name = "telemetriaLabel";
-            this.telemetriaLabel.Size = new System.Drawing.Size(147, 29);
+            this.telemetriaLabel.Size = new System.Drawing.Size(131, 29);
             this.telemetriaLabel.TabIndex = 3;
-            this.telemetriaLabel.Text = "Telemetria ";
+            this.telemetriaLabel.Text = "Telemetry";
             // 
             // scanButton
             // 
@@ -332,12 +325,14 @@
             // radarTextPanel
             // 
             this.radarTextPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarTextPanel.Controls.Add(this.label3);
+            this.radarTextPanel.Controls.Add(this.MDLabel);
             this.radarTextPanel.Controls.Add(this.cmRadarPanelLabel);
             this.radarTextPanel.Controls.Add(this.angleLabel);
             this.radarTextPanel.Controls.Add(this.distanceLabel);
-            this.radarTextPanel.Location = new System.Drawing.Point(752, 14);
+            this.radarTextPanel.Location = new System.Drawing.Point(757, 3);
             this.radarTextPanel.Name = "radarTextPanel";
-            this.radarTextPanel.Size = new System.Drawing.Size(214, 77);
+            this.radarTextPanel.Size = new System.Drawing.Size(214, 122);
             this.radarTextPanel.TabIndex = 1;
             // 
             // cmRadarPanelLabel
@@ -345,7 +340,7 @@
             this.cmRadarPanelLabel.AutoSize = true;
             this.cmRadarPanelLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.cmRadarPanelLabel.ForeColor = System.Drawing.Color.Green;
-            this.cmRadarPanelLabel.Location = new System.Drawing.Point(179, 15);
+            this.cmRadarPanelLabel.Location = new System.Drawing.Point(179, 47);
             this.cmRadarPanelLabel.Name = "cmRadarPanelLabel";
             this.cmRadarPanelLabel.Size = new System.Drawing.Size(32, 20);
             this.cmRadarPanelLabel.TabIndex = 2;
@@ -356,7 +351,7 @@
             this.angleLabel.AutoSize = true;
             this.angleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.angleLabel.ForeColor = System.Drawing.Color.Green;
-            this.angleLabel.Location = new System.Drawing.Point(3, 46);
+            this.angleLabel.Location = new System.Drawing.Point(3, 78);
             this.angleLabel.Name = "angleLabel";
             this.angleLabel.Size = new System.Drawing.Size(75, 25);
             this.angleLabel.TabIndex = 1;
@@ -367,7 +362,7 @@
             this.distanceLabel.AutoSize = true;
             this.distanceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.distanceLabel.ForeColor = System.Drawing.Color.Green;
-            this.distanceLabel.Location = new System.Drawing.Point(3, 11);
+            this.distanceLabel.Location = new System.Drawing.Point(3, 43);
             this.distanceLabel.Name = "distanceLabel";
             this.distanceLabel.Size = new System.Drawing.Size(103, 25);
             this.distanceLabel.TabIndex = 0;
@@ -561,41 +556,115 @@
             this.configurationsLabel.BackColor = System.Drawing.Color.Transparent;
             this.configurationsLabel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.configurationsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.configurationsLabel.Location = new System.Drawing.Point(11, 8);
+            this.configurationsLabel.Location = new System.Drawing.Point(4, 8);
             this.configurationsLabel.Name = "configurationsLabel";
-            this.configurationsLabel.Size = new System.Drawing.Size(65, 29);
+            this.configurationsLabel.Size = new System.Drawing.Size(62, 29);
             this.configurationsLabel.TabIndex = 3;
             this.configurationsLabel.Text = "Serial";
-            this.configurationsLabel.Click += new System.EventHandler(this.configurationButton_click);
+            this.configurationsLabel.Click += new System.EventHandler(this.SerialConfigurationButton_Click);
             this.configurationsLabel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
             this.configurationsLabel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
-            // settingsPanel
+            // serialConfigurationPanel
             // 
-            this.settingsPanel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.settingsPanel.BackColor = System.Drawing.Color.Transparent;
-            this.settingsPanel.Controls.Add(this.configurationsLabel);
-            this.settingsPanel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.settingsPanel.Location = new System.Drawing.Point(11, 8);
-            this.settingsPanel.Name = "settingsPanel";
-            this.settingsPanel.Size = new System.Drawing.Size(82, 37);
-            this.settingsPanel.TabIndex = 2;
-            this.settingsPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
-            this.settingsPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
+            this.serialConfigurationPanel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.serialConfigurationPanel.BackColor = System.Drawing.Color.Transparent;
+            this.serialConfigurationPanel.Controls.Add(this.configurationsLabel);
+            this.serialConfigurationPanel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.serialConfigurationPanel.Location = new System.Drawing.Point(11, 8);
+            this.serialConfigurationPanel.Name = "serialConfigurationPanel";
+            this.serialConfigurationPanel.Size = new System.Drawing.Size(69, 37);
+            this.serialConfigurationPanel.TabIndex = 2;
+            this.serialConfigurationPanel.MouseLeave += new System.EventHandler(this.settingsPanel_MouseLeave);
+            this.serialConfigurationPanel.MouseHover += new System.EventHandler(this.settingsPanel_MouseHover);
             // 
-            // stopTelemetriaButton
+            // filesConfigurationPanel
             // 
-            this.stopTelemetriaButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.stopTelemetriaButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-            this.stopTelemetriaButton.ForeColor = System.Drawing.Color.Teal;
-            this.stopTelemetriaButton.Location = new System.Drawing.Point(876, 108);
-            this.stopTelemetriaButton.Name = "stopTelemetriaButton";
-            this.stopTelemetriaButton.Size = new System.Drawing.Size(61, 36);
-            this.stopTelemetriaButton.TabIndex = 13;
-            this.stopTelemetriaButton.Text = "Stop";
-            this.stopTelemetriaButton.UseVisualStyleBackColor = true;
-            this.stopTelemetriaButton.Visible = false;
-            this.stopTelemetriaButton.Click += new System.EventHandler(this.stopTelemetriaButton_Click);
+            this.filesConfigurationPanel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.filesConfigurationPanel.BackColor = System.Drawing.Color.Transparent;
+            this.filesConfigurationPanel.Controls.Add(this.filesConfigurationsButton);
+            this.filesConfigurationPanel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.filesConfigurationPanel.Location = new System.Drawing.Point(80, 8);
+            this.filesConfigurationPanel.Name = "filesConfigurationPanel";
+            this.filesConfigurationPanel.Size = new System.Drawing.Size(59, 37);
+            this.filesConfigurationPanel.TabIndex = 4;
+            this.filesConfigurationPanel.MouseLeave += new System.EventHandler(this.filesConfigurationPanel_MouseLeave);
+            this.filesConfigurationPanel.MouseHover += new System.EventHandler(this.filesConfigurationPanel_MouseHover);
+            // 
+            // filesConfigurationsButton
+            // 
+            this.filesConfigurationsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.filesConfigurationsButton.BackColor = System.Drawing.Color.Transparent;
+            this.filesConfigurationsButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.filesConfigurationsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.filesConfigurationsButton.Location = new System.Drawing.Point(7, 8);
+            this.filesConfigurationsButton.Name = "filesConfigurationsButton";
+            this.filesConfigurationsButton.Size = new System.Drawing.Size(49, 29);
+            this.filesConfigurationsButton.TabIndex = 3;
+            this.filesConfigurationsButton.Text = "Files";
+            this.filesConfigurationsButton.Click += new System.EventHandler(this.FilesConfigurationsButton_Click);
+            this.filesConfigurationsButton.MouseLeave += new System.EventHandler(this.filesConfigurationPanel_MouseLeave);
+            this.filesConfigurationsButton.MouseHover += new System.EventHandler(this.filesConfigurationPanel_MouseHover);
+            // 
+            // radarConfigurationPanel
+            // 
+            this.radarConfigurationPanel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.radarConfigurationPanel.BackColor = System.Drawing.Color.Transparent;
+            this.radarConfigurationPanel.Controls.Add(this.radarConfigurationButton);
+            this.radarConfigurationPanel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.radarConfigurationPanel.Location = new System.Drawing.Point(142, 8);
+            this.radarConfigurationPanel.Name = "radarConfigurationPanel";
+            this.radarConfigurationPanel.Size = new System.Drawing.Size(63, 37);
+            this.radarConfigurationPanel.TabIndex = 5;
+            this.radarConfigurationPanel.MouseLeave += new System.EventHandler(this.radarConfigurationPanel_MouseLeave);
+            this.radarConfigurationPanel.MouseHover += new System.EventHandler(this.radarConfigurationPanel_MouseHover);
+            // 
+            // radarConfigurationButton
+            // 
+            this.radarConfigurationButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.radarConfigurationButton.BackColor = System.Drawing.Color.Transparent;
+            this.radarConfigurationButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.radarConfigurationButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.radarConfigurationButton.Location = new System.Drawing.Point(1, 8);
+            this.radarConfigurationButton.Name = "radarConfigurationButton";
+            this.radarConfigurationButton.Size = new System.Drawing.Size(62, 29);
+            this.radarConfigurationButton.TabIndex = 3;
+            this.radarConfigurationButton.Text = "Radar";
+            this.radarConfigurationButton.Click += new System.EventHandler(this.RadarConfigurationsButton_Click);
+            this.radarConfigurationButton.MouseLeave += new System.EventHandler(this.radarConfigurationPanel_MouseLeave);
+            this.radarConfigurationButton.MouseHover += new System.EventHandler(this.radarConfigurationPanel_MouseHover);
+            // 
+            // telemetriaEnterAngleLabel
+            // 
+            this.telemetriaEnterAngleLabel.AutoSize = true;
+            this.telemetriaEnterAngleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.telemetriaEnterAngleLabel.Location = new System.Drawing.Point(197, 81);
+            this.telemetriaEnterAngleLabel.Name = "telemetriaEnterAngleLabel";
+            this.telemetriaEnterAngleLabel.Size = new System.Drawing.Size(197, 25);
+            this.telemetriaEnterAngleLabel.TabIndex = 14;
+            this.telemetriaEnterAngleLabel.Text = "Enter angle for servo:";
+            // 
+            // MDLabel
+            // 
+            this.MDLabel.AutoSize = true;
+            this.MDLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.MDLabel.ForeColor = System.Drawing.Color.Green;
+            this.MDLabel.Location = new System.Drawing.Point(3, 14);
+            this.MDLabel.Name = "MDLabel";
+            this.MDLabel.Size = new System.Drawing.Size(57, 25);
+            this.MDLabel.TabIndex = 3;
+            this.MDLabel.Text = "M.D.";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+            this.label3.ForeColor = System.Drawing.Color.Green;
+            this.label3.Location = new System.Drawing.Point(179, 19);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(32, 20);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "cm";
             // 
             // MainForm
             // 
@@ -603,7 +672,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MediumTurquoise;
             this.ClientSize = new System.Drawing.Size(985, 644);
-            this.Controls.Add(this.settingsPanel);
+            this.Controls.Add(this.radarConfigurationPanel);
+            this.Controls.Add(this.filesConfigurationPanel);
+            this.Controls.Add(this.serialConfigurationPanel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.tabControl1);
             this.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -617,8 +688,6 @@
             this.tabPage1.ResumeLayout(false);
             this.radarPanel.ResumeLayout(false);
             this.radarPanel.PerformLayout();
-            this.maskedDistancePanel.ResumeLayout(false);
-            this.maskedDistancePanel.PerformLayout();
             this.telemetriaPanel.ResumeLayout(false);
             this.telemetriaPanel.PerformLayout();
             this.radarTextPanel.ResumeLayout(false);
@@ -630,7 +699,9 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.connectingPictureBox)).EndInit();
-            this.settingsPanel.ResumeLayout(false);
+            this.serialConfigurationPanel.ResumeLayout(false);
+            this.filesConfigurationPanel.ResumeLayout(false);
+            this.radarConfigurationPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -649,7 +720,7 @@
         private System.Windows.Forms.Label configurationsLabel;
         private System.Windows.Forms.PictureBox connectingPictureBox;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel settingsPanel;
+        private System.Windows.Forms.Panel serialConfigurationPanel;
         private System.Windows.Forms.Panel fileNamePanel;
         private System.Windows.Forms.Label fileNameLabel;
         private System.Windows.Forms.Label statusLabel;
@@ -677,13 +748,17 @@
         private System.Windows.Forms.Label deg150Label;
         private System.Windows.Forms.Label deg30Label;
         private System.Windows.Forms.Label deg60Label;
-        private System.Windows.Forms.Panel maskedDistancePanel;
-        private System.Windows.Forms.Label cmLabel;
-        private System.Windows.Forms.TextBox maskedDistanceTextBox;
-        private System.Windows.Forms.Label maskDistanceLabel;
         private System.Windows.Forms.Label cmRadarPanelLabel;
         private System.Windows.Forms.Label telemetriaCmLabel;
         private System.Windows.Forms.Button stopTelemetriaButton;
+        private System.Windows.Forms.Panel filesConfigurationPanel;
+        private System.Windows.Forms.Label filesConfigurationsButton;
+        private System.Windows.Forms.Panel radarConfigurationPanel;
+        private System.Windows.Forms.Label radarConfigurationButton;
+        private System.Windows.Forms.Label telemetriaOlLabel;
+        private System.Windows.Forms.Label telemetriaEnterAngleLabel;
+        private System.Windows.Forms.Label MDLabel;
+        private System.Windows.Forms.Label label3;
     }
 }
 

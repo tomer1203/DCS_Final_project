@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.IO.Ports;
-using TerminalProject.Source_files;
+using FinalProject.Source_files;
 using System.Threading;
 
-namespace TerminalProject
+namespace FinalProject
 {
-    public partial class ConfigurationsForm : Form
+    public partial class SerialConfigurationsForm : Form
     {
         private CustomSerialPort mSerialPort;
 
         /*
          * Construstor
          */
-        public ConfigurationsForm(ref CustomSerialPort serialPort)
+        public SerialConfigurationsForm(ref CustomSerialPort serialPort)
         {
             
             InitializeComponent();
@@ -94,7 +94,7 @@ namespace TerminalProject
                     mSerialPort.PortName = port;
                     mSerialPort.BaudRate = baudrate;
                     mSerialPort.Open();
-                    EventHub.OnSaveConfigurations(mSerialPort, EventArgs.Empty);
+                    EventHub.OnSaveSerialConfigurations(mSerialPort, EventArgs.Empty);
                     this.Close();
                     return;
                 }
@@ -110,27 +110,13 @@ namespace TerminalProject
                 {
                     mSerialPort.Open();
                     mSerialPort.sendMessage(CustomSerialPort.TYPE.BAUDRATE, baudrate.ToString());
-                    // mSerialPort.Close();
-                    // Delay is needed befor opening the port again
-                    //Thread.Sleep(CustomSerialPort.CONFIGURE_DELAY);
-                    EventHub.OnSaveConfigurations(mSerialPort, EventArgs.Empty);
+                    EventHub.OnSaveSerialConfigurations(mSerialPort, EventArgs.Empty);
                     this.Close();
                     return;
                 }
-                catch (Exception) { saveConfErrorLabel.Text = "error opening gate"; }
-                mSerialPort.clearMyBuffer();
-                mSerialPort.BaudRate = baudrate;
-                try
-                {
-                    mSerialPort.Open();
-                    EventHub.OnSaveConfigurations(mSerialPort, EventArgs.Empty);
-                    // Close window
-                    this.Close();
+                catch (Exception) {
+                    saveConfErrorLabel.Text = "error opening gate";
                 }
-                catch (Exception)
-                {
-                    saveConfErrorLabel.Text = "port already open";
-                };
 
             }
 

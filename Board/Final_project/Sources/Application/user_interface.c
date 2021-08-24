@@ -24,7 +24,8 @@ Menu script_menu          = {"3.Script      ",SCRIPT_E       ,script_enter    ,s
 Menu configuration_menu   = {"4.Config      ",CONFIGURATION_E,gen_enter       ,gen_scroll   ,gen_print   ,no_action  ,2,{&main_menu,&baud_menu}};
 //Menu back_menu            = {"<-Back        ",IDLE_E         ,return_command,no_action    ,no_action   ,no_action  ,0};
 Menu baud_menu            = {"Baud= 9600    ",IDLE_E         ,return_command  ,no_action    ,no_action   ,no_action  ,0};
-Menu main_menu =            {"<-Main menu   ",IDLE_E         ,gen_enter       ,gen_scroll   ,gen_print   ,no_action  ,4 ,{&radar_detection_menu,&telemeter_menu,&script_menu,&configuration_menu}};
+Menu main_menu_title	  = {"Main Menu     ",IDLE_E 		 ,no_action		  ,no_action	,no_action   ,no_action	 ,0};
+Menu main_menu 			  = {"<-Main menu   ",IDLE_E         ,gen_enter       ,gen_scroll   ,gen_print   ,no_action  ,5 ,{&main_menu_title,&radar_detection_menu,&telemeter_menu,&script_menu,&configuration_menu}};
 
 
 void copy_16chars(char* to, char* from) {
@@ -118,6 +119,7 @@ StateModes rad_detect_sys(){
 	char msg[20] = {0};
 	enterON = FALSE;
 	enable_sensor(TRUE);
+	Print("Scanning");
 	while (1){
 		WriteServo(degree);
 		degree += SERVO_DEG_CHANGE;
@@ -130,7 +132,6 @@ StateModes rad_detect_sys(){
 		if (distance_ready){
 			build_scan_msg(msg,out_distance,degree);
 			send2pc("Sc",msg);
-			Print(msg);
 			distance_ready = FALSE;
 		}
 		if (enterON || stopRadar){
@@ -145,11 +146,11 @@ StateModes telemeter_system(){
 	char str[16];
 	enterON = FALSE;
 	enable_sensor(TRUE);
+	Print("Telemetry");
 	while(1){
 		if (distance_ready){
 			sprintf(str,"%d",out_distance);
 			send2pc("Te",str);
-			Print(str);
 			distance_ready = FALSE;
 		}
 		if (enterON || stopRadar){
@@ -206,7 +207,7 @@ StateModes script_enter() {
 	}
 	return SCRIPT_E;
 }
-void       script_scroll(){
+void script_scroll(){
 	if (line_select != menu.num_submenus-1) {
 		last_file_select = file_select;
 		file_select = file_index_plusplus(file_select); // -1 is for back
@@ -215,7 +216,7 @@ void       script_scroll(){
 	}
 	line_select = get_next_line(line_select, menu.num_submenus);
 }
-void       script_print() {
+void script_print() {
 	if (line_select == 0) {
 		Print_two_lines(back, current_file_desc->name);
 	}

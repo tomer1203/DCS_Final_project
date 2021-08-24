@@ -47,17 +47,6 @@ void Fsm(void){
 		}
 		stopRadar = FALSE;
 		wait();
-//		switch (state){
-//		
-//		case IDLE_E:
-//			wait(); 
-//			break;
-//		
-//		}
-//		case SCRIPT_E:
-//			break;
-//		case TELEMETER_E:
-//			break;
 	}
 	
 }

@@ -105,7 +105,7 @@ void FTM0_IRQHandler(){
 		if (distance_index == DIST_AVG_SIZE){
 			distance_index = 0;
 		}
-		acc_distance += distance - last_value;
+		acc_distance += (distance - last_value);
 		out_distance = acc_distance >> 3;
 		
 		distance_ready = TRUE;
@@ -169,9 +169,6 @@ void handleMessage(){
 		send2pc(TYPE.STATUS, STATUS.CHECKSUM_ERROR);
 		clear_string_buffer();
 		return;
-	}
-	else {
-		//send2pc(TYPE.STATUS, STATUS.OK);
 	}
 	
 	switch (state) {

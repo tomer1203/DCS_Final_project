@@ -56,11 +56,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigurationsForm.cs">
+    <Compile Include="FilesConfigurationsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConfigurationsForm.Designer.cs">
-      <DependentUpon>ConfigurationsForm.cs</DependentUpon>
+    <Compile Include="FilesConfigurationsForm.Designer.cs">
+      <DependentUpon>FilesConfigurationsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RadarConfigurationsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RadarConfigurationsForm.Designer.cs">
+      <DependentUpon>RadarConfigurationsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SerialConfigurationsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SerialConfigurationsForm.Designer.cs">
+      <DependentUpon>SerialConfigurationsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -77,8 +89,14 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Source files\EventHub.cs" />
-    <EmbeddedResource Include="configurationsForm.resx">
-      <DependentUpon>ConfigurationsForm.cs</DependentUpon>
+    <EmbeddedResource Include="FilesConfigurationsForm.resx">
+      <DependentUpon>FilesConfigurationsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RadarConfigurationsForm.resx">
+      <DependentUpon>RadarConfigurationsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SerialConfigurationsForm.resx">
+      <DependentUpon>SerialConfigurationsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

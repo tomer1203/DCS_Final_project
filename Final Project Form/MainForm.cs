@@ -8,13 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using TerminalProject.Source_files;
+using FinalProject.Source_files;
 using System.IO.Ports;
 using System.IO;
 using System.Threading;
 using System.Runtime.InteropServices;
 
-namespace TerminalProject
+namespace FinalProject
 {
     public partial class MainForm : Form
     {
@@ -33,7 +33,6 @@ namespace TerminalProject
         ////////////////
         private string currentDirectoryPath;
         private string filesToSendDirectory = "Final Project Files/Files to send";
-        private string filesRecievedDirectory = "Final Project Files/Files recieved";
         private string selectedFilePath = "";
         private string dataFilesPath = "";
 
@@ -41,15 +40,15 @@ namespace TerminalProject
         // Radar System
         ////////////////
         private bool scanMode = false;
-        private float maskedDistance =  200; // cm
+        private float maskedDistance =  100; // cm
         private System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
 
         private int WIDTH, HEIGHT, HAND;
-        private int handDegMain;                                     // in degree
+        private int handDegMain, beamRange = 60;                                     // in degree
         private int handGreenX, handGreenY, handRedX, handRedY;      // HAND coordinate
-        private const int LIM = 30, MAX_SERVO_ANGLE = 180;
+        private const int MAX_SERVO_ANGLE = 180;
         private int circleX, circleY;                                // center of the circle
-        private Point[] linesArray = new Point[3 * LIM];
+        private Point[] linesArray;
 
         // radar drawing
         private Bitmap bmp;
@@ -60,11 +59,11 @@ namespace TerminalProject
         private static double greenHue = Color.Green.GetHue();
         private static double greenSaturation = Color.Green.GetSaturation();
         private static double greenBrightness = Color.Green.GetBrightness();
-        private Color[] greenColorList = new Color[LIM];
+        private Color[] greenColorList;
         private static double redHue = Color.Red.GetHue();
         private static double redSaturation = Color.Red.GetSaturation();
         private static double redBrightness = Color.Red.GetBrightness();
-        private Color[] redColorList = new Color[LIM];
+        private Color[] redColorList;
 
 
         /*
@@ -83,6 +82,8 @@ namespace TerminalProject
 
             // Get Current Directory
             currentDirectoryPath = Environment.CurrentDirectory;
+            // Get Files Directory Path
+            dataFilesPath = Path.Combine(currentDirectoryPath, filesToSendDirectory);
 
             // Serial Port
             serialPort = new CustomSerialPort();
@@ -96,14 +97,16 @@ namespace TerminalProject
             catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
 
             // Event Hub Handlers
-            EventHub.saveConfigurationsHandler += onSerialConfigurationsChanged;
-            EventHub.fileSendingProgressHandler += onFileSendingProgress;
+            EventHub.SaveSerialConfigurationsHandler += onSerialConfigurationsChanged;
+            EventHub.SaveRadarConfigurationsHandler += onRadarConfigurationsChanged;
+            EventHub.SaveFileConfigurationsHandler += onFilesConfigurationsChanged;
+            EventHub.FileSendingProgressHandler += onFileSendingProgress;
+           
+
+            onRadarConfigurationsChanged(this, (maskedDistance, beamRange));
 
             // List View Initialization
             initializeFilesListView();
-
-            // Set Default Masked Distance
-            maskedDistanceTextBox.Text = maskedDistance.ToString();
 
         } // END MainForm
 
@@ -126,15 +129,6 @@ namespace TerminalProject
             circleX = radarPanel.Width / 2  + 55;
             circleY = radarPanel.Height;
 
-            for (int i = 0; i < LIM-1; i++) {
-                greenColorList[i] = ColorFromHSV(greenHue, greenSaturation, greenBrightness - (greenBrightness * i / (LIM - 1)) );
-                redColorList[i] = ColorFromHSV(redHue, redSaturation, redBrightness - (redBrightness * i / (LIM - 1)) );
-            }
-            greenColorList[0] = Color.Green;
-            greenColorList[LIM - 1] = Color.Black;
-            redColorList[0] = Color.Red;
-            redColorList[LIM - 1] = Color.Black;
-
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,14 +143,13 @@ namespace TerminalProject
             // Convert deg to range [-90,90]
             handDegMain = -(deg - 90);
             // Convert dist relative to HAND & maskedDistance
-            maskedDistance = float.Parse(maskedDistanceTextBox.Text);
             float adjustedDist = dist > maskedDistance ?
                                         HAND : (dist * HAND) / maskedDistance;
 
             // Initiallize Pens
-            penGreenList = new Pen[LIM];
-            penRedList = new Pen[LIM];
-            for (int i = 0; i < LIM; i++)
+            penGreenList = new Pen[beamRange];
+            penRedList = new Pen[beamRange];
+            for (int i = 0; i < beamRange; i++)
             {
                 penGreenList[i] = new Pen(greenColorList[i], 2.5f);
                 penRedList[i] = new Pen(redColorList[i], 2.5f);
@@ -340,9 +333,9 @@ namespace TerminalProject
 
                 // Recieve Telemetria info
                 case CustomSerialPort.TYPE.TELMETERIA:
-                    float distance = calcDistsnce(float.Parse(val)) > maskedDistance ?
-                        maskedDistance : calcDistsnce(float.Parse(val));
-                    Console.WriteLine("Telemetria: Distance- " + distance + "cm" );
+                    string distanceString = calcDistsnce(float.Parse(val)) > maskedDistance ?
+                        "Out of Range" : calcDistsnce(float.Parse(val)).ToString("#.##") + " cm";
+                    Console.WriteLine("Telemetria: Distance- " + distanceString);
                     updateFileTransferStatusLabel("");
                     this.Invoke((MethodInvoker)delegate
                     {
@@ -350,97 +343,14 @@ namespace TerminalProject
                             scanButton_Click(this, EventArgs.Empty);
                         stopTelemetriaButton.Visible = true;
                         scanButton.Visible = false;
-                        if (maskedDistanceTextBox.Text.Equals("")) return;
-                        maskedDistance = float.Parse(maskedDistanceTextBox.Text);
-                        telemetriaDistanceLabel.Text = "Distance: " + distance.ToString("#.##");
-                        telemetriaCmLabel.Visible = true;
+                        telemetriaDistanceLabel.Text = "Distance: " + distanceString;
+                        telemetriaPanel.Visible = true;
                     });
                     break;
 
                 // Get MCU Serial Port Status
                 case CustomSerialPort.TYPE.STATUS:
                     handleStatusMessage(int.Parse(val));
-                    break;
-
-                // Recieving file
-                case CustomSerialPort.TYPE.FILE_START:
-                    selectTab(1);
-                    if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_OK)
-                    {
-                        CustomSerialPort.RFile.Status = CustomSerialPort.STATUS.RECIEVING_FILE;
-                        Console.WriteLine("======================================================");
-                        Console.WriteLine("recieving a file...");
-                        updateFileTransferStatusLabel("recieving a file...");
-
-                    }
-                    else {
-                        CustomSerialPort.RFile.Status = CustomSerialPort.STATUS.RECIEVING_ERROR;
-                        CustomSerialPort.RFile.Status = CustomSerialPort.STATUS.RECIEVING_OK;
-                        Console.WriteLine("ERROR - trying to send a new file when already recieving a file");
-                        updateFileTransferStatusLabel("ERROR - trying to send a new file when already recieving a file");
-                    }
-                    break;
-
-                // Recieving file's Name
-                case CustomSerialPort.TYPE.FILE_NAME:
-                    if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
-                        break;
-                    CustomSerialPort.RFile.Name = val;
-                    Console.WriteLine("recieving \"" + val + "\"");
-                    updateFileTransferStatusLabel("recieving \"" + val + "\"");
-
-
-                    break;
-
-                // Recieving file's Size
-                case CustomSerialPort.TYPE.FILE_SIZE:
-                    if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
-                        break;
-                    CustomSerialPort.RFile.Size = int.Parse(val);
-                    Console.WriteLine("file size: " + val);
-                    updateFileTransferStatusLabel("file size: " + val);
-                    
-                    break;
-
-                // Recieving file's Data
-                case CustomSerialPort.TYPE.FILE_DATA:
-                    if (CustomSerialPort.RFile.Status == CustomSerialPort.STATUS.RECIEVING_ERROR)
-                    {
-                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        Console.WriteLine("writing file data ERROR");
-                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        break;
-                    }
-                    CustomSerialPort.RFile.Data += val;                       
-                    Console.WriteLine(val);
-                    updateFileTransferStatusLabel("received " + CustomSerialPort.RFile.Data.Length + " / " + CustomSerialPort.RFile.Size + " bytes");
-
-                    if(CustomSerialPort.RFile.Data.Length == CustomSerialPort.RFile.Size)
-                    {
-                        string path = Path.Combine(currentDirectoryPath, filesRecievedDirectory, CustomSerialPort.RFile.Name);
-                        File.WriteAllText(path, CustomSerialPort.RFile.Data);
-                        Console.WriteLine("\"" + CustomSerialPort.RFile.Name + "\" received successfully");
-                        Console.WriteLine("======================================================");
-                        updateFileTransferStatusLabel("\"" + CustomSerialPort.RFile.Name + "\" received successfully");
-                        CustomSerialPort.RFile.clean();
-                    }
-                    break;
-
-                // File recieved ok 
-                case CustomSerialPort.TYPE.FILE_END:
-                    if (int.Parse(val) == CustomSerialPort.STATUS.OK)
-                    {
-                        updateFileTransferStatusLabel("\"" + Path.GetFileName(selectedFilePath) + "\" sent successfully");
-                        Console.WriteLine("\"" + Path.GetFileName(selectedFilePath) + "\" sent successfully");
-                        Console.WriteLine("======================================================");
-                    }
-                    else
-                    {
-                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        Console.WriteLine("\"" + CustomSerialPort.RFile.Name + "\" did not send successfully");
-                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                        updateFileTransferStatusLabel("\"" + CustomSerialPort.RFile.Name + "\" did not send successfully");
-                    }
                     break;
 
                 // Unknown
@@ -541,21 +451,114 @@ namespace TerminalProject
         }
 
         /*
-         * Set Configuretions
+         * Set Serial Configuretions
          */
-        private void configurationButton_click(object sender, EventArgs e)
+        private void SerialConfigurationButton_Click(object sender, EventArgs e)
         {
             // start configuration window
-            if ((Application.OpenForms["ConfigurationsForm"] as ConfigurationsForm) != null)
+            if ((Application.OpenForms["ConfigurationsForm"] as SerialConfigurationsForm) != null)
             {
                 //Form is already open
                 Application.OpenForms["ConfigurationsForm"].Close();
             }
 
-            ConfigurationsForm configurationsForm = new ConfigurationsForm(ref serialPort);
+            SerialConfigurationsForm configurationsForm = new SerialConfigurationsForm(ref serialPort);
             configurationsForm.MinimizeBox = false;
             configurationsForm.MaximizeBox = false;
             configurationsForm.Show();
+        }
+
+        /*
+        * Set Files Configuretions
+        */
+        private void FilesConfigurationsButton_Click(object sender, EventArgs e)
+        {
+            // start configuration window
+            if ((Application.OpenForms["filesConfigurationsForm"] as FilesConfigurationsForm) != null)
+            {
+                //Form is already open
+                Application.OpenForms["filesConfigurationsForm"].Close();
+            }
+
+            
+            FilesConfigurationsForm filesConfigurationsForm = new FilesConfigurationsForm(Path.Combine(currentDirectoryPath, filesToSendDirectory));
+            filesConfigurationsForm.MinimizeBox = false;
+            filesConfigurationsForm.MaximizeBox = false;
+            filesConfigurationsForm.Show();
+        }
+
+        /*
+        * Files Confighrations Change Listener
+        */
+        private void onFilesConfigurationsChanged(object sender, EventArgs e)
+        {
+            this.dataFilesPath = sender.ToString();
+        }
+
+        /*
+       * Set Radar Configuretions
+       */
+        private void RadarConfigurationsButton_Click(object sender, EventArgs e)
+        {
+            // start configuration window
+            if ((Application.OpenForms["radarConfigurationsForm"] as RadarConfigurationsForm) != null)
+            {
+                //Form is already open
+                Application.OpenForms["radarConfigurationsForm"].Close();
+            }
+
+
+            RadarConfigurationsForm radarConfigurationsForm = new RadarConfigurationsForm(maskedDistance, beamRange);
+            radarConfigurationsForm.MinimizeBox = false;
+            radarConfigurationsForm.MaximizeBox = false;
+            radarConfigurationsForm.Show();
+        }
+
+        /*
+        * Radar Confighrations Change Listener
+        */
+        private void onRadarConfigurationsChanged(object sender, (float maskedDistance, int beamRange) e)
+        {           
+
+            this.maskedDistance = e.maskedDistance;
+            this.beamRange = e.beamRange;
+
+            MDLabel.Text = "M.D.:" + maskedDistance;
+
+            // Erase Lines
+            try
+            {
+                graphics = Graphics.FromImage(bmp);
+                Pen blackPen = new Pen(Color.Black, 2.5f);
+                for (int i = 0; i < linesArray.Length; i += 3)
+                {
+                    if (linesArray[i].IsEmpty)
+                        break;
+                    System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
+                    graphics.DrawLine(blackPen, linesArray[i], linesArray[i + 1]);
+                    graphics.DrawLine(blackPen, linesArray[i + 1], linesArray[i + 2]);
+                }
+                blackPen.Dispose();
+                graphics.Dispose();
+                radarPictureBox.Image = bmp;
+
+            }
+            catch (Exception) { }
+
+
+            linesArray = new Point[3 * beamRange];
+            redColorList = new Color[beamRange];
+            greenColorList = new Color[beamRange];
+
+            for (int i = 0; i < beamRange - 1; i++)
+            {
+                greenColorList[i] = ColorFromHSV(greenHue, greenSaturation, greenBrightness - (greenBrightness * i / (beamRange - 1)));
+                redColorList[i] = ColorFromHSV(redHue, redSaturation, redBrightness - (redBrightness * i / (beamRange - 1)));
+            }
+            greenColorList[0] = Color.Green;
+            greenColorList[beamRange - 1] = Color.Black;
+            redColorList[0] = Color.Red;
+            redColorList[beamRange - 1] = Color.Black;
         }
 
         /*
@@ -574,19 +577,52 @@ namespace TerminalProject
         }
 
         /*
-        * Serial Button Mouse Hover
-        */
+         * Radar Configuration Button Mouse Hover
+         */
+        private void radarConfigurationPanel_MouseHover(Object sender, EventArgs e)
+        {
+            this.radarConfigurationPanel.BackColor = Color.LightSeaGreen;
+        }
+
+        /*
+         * Radar Configuration Button Mouse Leave
+         */
+        private void radarConfigurationPanel_MouseLeave(Object sender, EventArgs e)
+        {
+            this.radarConfigurationPanel.BackColor = Color.Transparent;
+        }
+
+        /*
+         * Files Configuration Button Mouse Hover
+         */
+        private void filesConfigurationPanel_MouseHover(Object sender, EventArgs e)
+        {
+            this.filesConfigurationPanel.BackColor = Color.LightSeaGreen;
+        }
+
+        /*
+         * Files Configuration Button Mouse Leave
+         */
+        private void filesConfigurationPanel_MouseLeave(Object sender, EventArgs e)
+        {
+            this.filesConfigurationPanel.BackColor = Color.Transparent;
+        }
+
+        /*
+         * Serial Button Mouse Hover
+         */
         private void settingsPanel_MouseHover(Object sender, EventArgs e)
         {
-            this.settingsPanel.BackColor = Color.LightSeaGreen;
+            this.serialConfigurationPanel.BackColor = Color.LightSeaGreen;
         }
+
 
         /*
          * Serial Button Mouse Leave
          */
         private void settingsPanel_MouseLeave(Object sender, EventArgs e)
         {
-            this.settingsPanel.BackColor = Color.Transparent;
+            this.serialConfigurationPanel.BackColor = Color.Transparent;
         }
 
        /*
@@ -648,7 +684,11 @@ namespace TerminalProject
         private void telemetriaButton_Click(object sender, EventArgs e)
         {
             if (telemetriaDataTextBox.Text.Equals(""))
+            {
+                updateRadarStatusLabel("enter servo angle");
                 return;
+            }
+                
 
             // Send Message to MCU
             try
@@ -668,7 +708,10 @@ namespace TerminalProject
             }
             catch (Exception)
             {
-                updateRadarStatusLabel("sevo degree accepts only integers in range [0,180]");
+                if(serialPort.IsOpen)
+                    updateRadarStatusLabel("servo degree accepts only integers in range [0,180]");
+                else
+                    updateRadarStatusLabel("configure serial port");
             }
         }
 
@@ -677,10 +720,21 @@ namespace TerminalProject
          */ 
         private void scanButton_Click(object sender, EventArgs e)
         {
+            if(!serialPort.IsOpen)
+            {
+                updateRadarStatusLabel("configure serial port");
+                return;
+            }
             if (scanMode) // Stop scanning
             {
                 scanMode = false;
-                serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR, "");
+                try
+                {
+                    serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR, "");
+                    serialPort.clearMyBuffer();
+                    setConnectingLabel(CustomSerialPort.STATUS.OK);
+                }
+                catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                 scanButton.Text = "Start Scan";
                 radarPictureBox.Visible = false;
                 radarTextPanel.Visible = false;
@@ -690,19 +744,22 @@ namespace TerminalProject
                 deg60Label.Visible = false;
                 deg30Label.Visible = false;
                 // Telemetria On
-                maskedDistancePanel.Visible = true;
                 telemetriaButton.Visible = true;
                 telemetriaDataTextBox.Visible = true;
                 telemetriaLabel.Visible = true;
                 telemetriaPanel.Visible = true;
+                telemetriaEnterAngleLabel.Visible = true;
                 radarPanel.BackColor = Color.Transparent;
                 t.Stop();
             }
             else // start scanning
             {
                 scanMode = true;
-                serialPort.sendMessage(CustomSerialPort.TYPE.SCAN,"");
-                maskedDistance = float.Parse(maskedDistanceTextBox.Text);
+                try
+                {
+                    serialPort.sendMessage(CustomSerialPort.TYPE.SCAN, "");
+                }
+                catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                 scanButton.Text = "Stop Scan";
                 radarPictureBox.Visible = true;
                 radarTextPanel.Visible = true;
@@ -712,11 +769,11 @@ namespace TerminalProject
                 deg60Label.Visible = true;
                 deg30Label.Visible = true;
                 // Telemetria Off
-                maskedDistancePanel.Visible = false;
                 telemetriaButton.Visible = false;
                 telemetriaDataTextBox.Visible = false;
                 telemetriaLabel.Visible = false;
                 telemetriaPanel.Visible = false;
+                telemetriaEnterAngleLabel.Visible = false;
                 radarPanel.BackColor = Color.Black;
                 t.Start();
             }
@@ -744,7 +801,9 @@ namespace TerminalProject
             if (scriptNameTextBox.Text.Equals("") || scriptDataRichTextBox.Text.Equals(""))
                 return;
             string path = Path.Combine(currentDirectoryPath, filesToSendDirectory, scriptNameTextBox.Text + ".txt");
-            File.WriteAllText(path, scriptDataRichTextBox.Text);
+            string text = scriptDataRichTextBox.Text;
+            text = text.Replace("\n","\r\n");
+            File.WriteAllText(path, text);
             filesListView.Clear();
             initializeFilesListView();
             scriptNameTextBox.Text = "";
@@ -760,6 +819,8 @@ namespace TerminalProject
             serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR,"");
             stopTelemetriaButton.Visible = false;
             scanButton.Visible = true;
+            serialPort.clearMyBuffer();
+            setConnectingLabel(CustomSerialPort.STATUS.OK);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -796,6 +857,7 @@ namespace TerminalProject
                     if (Path.GetFileName(filePath).Equals(selectedFile) && Path.GetExtension(filePath) == ".txt")
                     {
                         selectedFilePath = filePath;
+                        updateRadarStatusLabel("");
                     }
                 }
 
@@ -811,8 +873,6 @@ namespace TerminalProject
             // Set Column
             this.filesListView.Columns.Add("Name", 300, HorizontalAlignment.Left);
             this.filesListView.Columns.Add("Size", -2, HorizontalAlignment.Left);
-            // get Directory
-            dataFilesPath = Path.Combine(currentDirectoryPath, filesToSendDirectory);
 
             if (Directory.Exists(dataFilesPath))
             {
@@ -840,8 +900,17 @@ namespace TerminalProject
         private void sendFileButton_Click(object sender, EventArgs e)
         {
             if (selectedFilePath.Equals(""))
+            {
+                updateFileTransferStatusLabel("select a file");
                 return;
-           
+            }
+
+            if (!serialPort.IsOpen)
+            {
+                updateFileTransferStatusLabel("configure serial port");
+                return;
+            }
+
 
             // Send File to MCU
             try

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TerminalProject.Source_files
+namespace FinalProject.Source_files
 {
     class DisabledRichTextBox : System.Windows.Forms.RichTextBox
     {
