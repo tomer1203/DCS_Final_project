@@ -199,11 +199,9 @@ void InitPIT() {
 	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK; //Enable the Clock to the PIT Modules
 	// Timer 0
 	PIT_LDVAL0 = 0x00186A00; // setup timer 0 for 15hz counting period
-	PIT_LDVAL1 = 0x000912C0; // setup timer 0 for 10msec counting period
-	//PIT_TCTRL0 = PIT_TCTRL_TEN_MASK | PIT_TCTRL_TIE_MASK; //enable PIT0 and its interrupt
 
 	// Timer 1
-	//PIT_TCTRL1 = PIT_TCTRL_TEN_MASK ;//| PIT_TCTRL_TIE_MASK; //enable PIT0 and its interrupt
+	PIT_LDVAL1 = 0x000912C0; // setup timer 0 for 10msec counting period
 
 	PIT_MCR |= PIT_MCR_FRZ_MASK; // stop the pit when in debug mode
 

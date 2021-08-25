@@ -352,6 +352,24 @@ namespace FinalProject
                     handleStatusMessage(int.Parse(val));
                     break;
 
+                // File recieved ok 
+                case CustomSerialPort.TYPE.FILE_END:
+                    if (int.Parse(val) == CustomSerialPort.STATUS.OK)
+                    {
+                        updateFileTransferStatusLabel("\"" + Path.GetFileName(selectedFilePath) + "\" sent successfully");
+                        Console.WriteLine("\"" + Path.GetFileName(selectedFilePath) + "\" sent successfully");
+                        Console.WriteLine("======================================================");
+                    }
+                    else
+                    {
+                        // STOP SENDING FILE
+                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                        Console.WriteLine("\"" + CustomSerialPort.RFile.Name + "\" did not send successfully with status " );
+                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                        updateFileTransferStatusLabel("\"" + CustomSerialPort.RFile.Name + "\" did not send successfully");
+                    }
+                    break;
+
                 // Unknown
                 default:
                     Console.WriteLine("unreccognized type");
@@ -803,6 +821,7 @@ namespace FinalProject
             Console.WriteLine(Path.GetFileName(selectedFilePath) + " Deleted");
             File.Delete(selectedFilePath);
             filesListView.Clear();
+            initializeFilesListView();
 
         }
 
