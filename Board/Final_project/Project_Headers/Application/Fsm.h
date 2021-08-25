@@ -14,12 +14,12 @@
 
 
 int interval;
-int enterON;
-int scroll_downON;
-int print_uiON;
-int stopRadar;
-int activateScan;	
-int activateTelemeter;
+volatile int enterON;
+volatile int scroll_downON;
+volatile int print_uiON;
+volatile int stopRadar;
+volatile int activateScan;	
+volatile int activateTelemeter;
 
 typedef enum StateModes{
 	IDLE_E,

@@ -23,11 +23,11 @@ void init_hal(){
 void enable_sensor(int enable){
 	if (enable){
 		init_sensor_hal();
-		StartTPMx(0, TRUE);
-		StartTPMx(2, TRUE);
+		StartTPMx(SENSOR_ECHO, TRUE);
+		StartTPMx(SENSOR_TRIG, TRUE);
 	} else {
-		StartTPMx(0, FALSE);
-		StartTPMx(2, FALSE);
+		StartTPMx(SENSOR_ECHO, FALSE);
+		StartTPMx(SENSOR_TRIG, FALSE);
 	}
 }
 //-----------------------------------------------------------------
@@ -39,13 +39,11 @@ void PORTD_IRQHandler(void){
 	if (PORTD_ISFR & PTD_7) {
 		if(!(GPIOD_PDIR & PTD_7)){
 			RED_LED_TOGGLE;
-			//scroll_down();
 			scroll_downON = TRUE;
 		}
 	}
 	if(PORTD_ISFR & PTD_6){
 		if(!(GPIOD_PDIR & PTD_6)){
-			//enter();
 			enterON = TRUE;
 			BLUE_LED_TOGGLE;
 		}
@@ -71,14 +69,11 @@ void PIT_IRQHandler(){
     if(PIT_TFLG0 & PIT_TFLG_TIF_MASK){
         PIT_TFLG0 = PIT_TFLG_TIF_MASK; //clear the Pit 0 Irq flag 
         PitDelayDone = TRUE;
-        //RED_LED_ON;
         
     }
     
     if(PIT_TFLG1 & PIT_TFLG_TIF_MASK){
-        PIT_TFLG1 = PIT_TFLG_TIF_MASK; //clear the Pit 1 Irq flag
-        //RED_LED_OFF;
-        
+        PIT_TFLG1 = PIT_TFLG_TIF_MASK; //clear the Pit 1 Irq flag        
     }
 	
 }
@@ -106,7 +101,7 @@ void FTM0_IRQHandler(){
 			distance_index = 0;
 		}
 		acc_distance += (distance - last_value);
-		out_distance = acc_distance >> 3;
+		out_distance = acc_distance >> LOG2_DIST_AVG_SIZE;
 		
 		distance_ready = TRUE;
 		//StartTPMx(0, FALSE);
@@ -264,7 +259,6 @@ void changeBaudrate(){
 void InitTimers(){
 	InitPIT();
 	ClockSetupTPM();
-	InitTPMx(0);
 }
 
 /*

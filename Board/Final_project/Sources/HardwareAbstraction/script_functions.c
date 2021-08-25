@@ -81,7 +81,7 @@ void servo_deg(int degree){
 	if (distance_ready){
 		build_scan_msg(msg,out_distance,degree);
 		send2pc("Sc",msg);
-		Print(msg);
+		Print("Telemetry");
 		distance_ready = FALSE;
 	}
 	enable_sensor(FALSE);
@@ -99,7 +99,7 @@ void servo_scan(int left_angle,int right_angle){
 		if (distance_ready){
 			build_scan_msg(msg,out_distance,angle);
 			send2pc("Sc",msg);
-			Print(msg);
+			Print("Scanning");
 			distance_ready = FALSE;
 		}
 		angle+=SERVO_DEG_CHANGE;

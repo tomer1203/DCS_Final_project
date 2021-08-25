@@ -16,8 +16,8 @@
 #define SENSOR_ECHO 0
 #define SERVO_DEG_MAX 180
 #define SERVO_DEG_MIN 0
-#define TPM_DC_VAL_MIN 900 // ~5% * 20ms = 1ms 
-#define TPM_DC_VAL_MAX 3750// ~10% * 20ms = 2ms
+#define TPM_DC_VAL_MIN 750 //900 // ~5% * 20ms = 1ms 
+#define TPM_DC_VAL_MAX 3550//3750// ~10% * 20ms = 2ms
 
 #define SERVO_DEG_CHANGE 1
 

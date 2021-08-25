@@ -49,8 +49,8 @@ void InitGPIO() {
 	lcd_init(); // init the LCD
 	
 	/////// Servo /////////////////
-	GPIOA_PDDR |= PORT_LOC(12);    // PTA12 is output
-	PORTA_PCR12 = PORT_PCR_MUX(3); // TPM1_CH0- ALT4
+	
+	PORTA_PCR12 = PORT_PCR_MUX(3); // TPM1_CH0 - ALT3
 
 	/////// Ultra-sonic sensor/////
 	// Trigger
@@ -86,8 +86,8 @@ void ClockSetup() {
 // TPMx - Initialization
 //-----------------------------------------------------------------
 void InitTPMx(char x){  // x={0,1,2}
-	switch(x){ // Echo
-	case 0: // Init TPM 0 Channel 4 for PTD4 (? FTM0_CH4 ?) page 567  
+	switch(x){ 
+	case 0: // Echo
 		TPM0_SC = 0; // to ensure that the counter is not running
 		TPM0_SC |= TPM_SC_PS(3); //Prescaler 8
 		// TPM period = (MOD + 1) * CounterClock_period

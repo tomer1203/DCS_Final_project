@@ -11,6 +11,7 @@
 #define MAX_STRING 524
 #define PACKET_SIZE 128
 #define DIST_AVG_SIZE 8
+#define LOG2_DIST_AVG_SIZE 3
 char string_buffer[MAX_STRING];
 int string_index;
 int input_string_length;

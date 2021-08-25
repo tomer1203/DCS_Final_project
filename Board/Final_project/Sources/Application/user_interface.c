@@ -122,13 +122,13 @@ StateModes rad_detect_sys(){
 	Print("Scanning");
 	while (1){
 		WriteServo(degree);
+		//enable_sensor(TRUE);
 		degree += SERVO_DEG_CHANGE;
-		if (degree > 180){
-			degree = 0;
+		if (degree > SERVO_DEG_MAX){
+			degree = SERVO_DEG_MIN;
 		}
-		while(!distance_ready){
-			WaitDelay(10);
-		}
+		while(!distance_ready);
+		
 		if (distance_ready){
 			build_scan_msg(msg,out_distance,degree);
 			send2pc("Sc",msg);
@@ -137,8 +137,10 @@ StateModes rad_detect_sys(){
 		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
+			Print_two_lines("Scan","Stopped");
 			return state;
 		}
+		//enable_sensor(FALSE);
 		WaitDelay(SCAN_DELAY);
 	}
 }
@@ -156,6 +158,7 @@ StateModes telemeter_system(){
 		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
+			Print_two_lines("Telemetry","Stopped");
 			return state;
 		}
 		WaitDelay(50);

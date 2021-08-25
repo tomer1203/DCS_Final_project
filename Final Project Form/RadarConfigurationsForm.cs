@@ -19,7 +19,7 @@ namespace FinalProject
             InitializeComponent();
 
             this.maskedDistanceTextBox.Text = maskedDistance.ToString();
-            this.beamRangeTextBox.Text = range.ToString();
+            this.beamRangeTextBox.Text = (range/2).ToString();
         }
 
         /*

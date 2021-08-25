@@ -41,10 +41,9 @@ namespace FinalProject
         ////////////////
         private bool scanMode = false;
         private float maskedDistance =  100; // cm
-        private System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
 
         private int WIDTH, HEIGHT, HAND;
-        private int handDegMain, beamRange = 60;                                     // in degree
+        private int handDegMain, beamRange = 120;                                     // in degree
         private int handGreenX, handGreenY, handRedX, handRedY;      // HAND coordinate
         private const int MAX_SERVO_ANGLE = 180;
         private int circleX, circleY;                                // center of the circle
@@ -324,7 +323,7 @@ namespace FinalProject
                     this.Invoke((MethodInvoker)delegate
                     {
                         if(!scanMode)
-                            scanButton_Click(this,EventArgs.Empty);
+                            scanButton_Click("false",EventArgs.Empty);
                         RadarVisualisation(deg, dist);
                         angleLabel.Text = "Angle: " + deg;
                         distanceLabel.Text = "Distance: " + dist.ToString("#.##");
@@ -340,7 +339,7 @@ namespace FinalProject
                     this.Invoke((MethodInvoker)delegate
                     {
                         if (scanMode)
-                            scanButton_Click(this, EventArgs.Empty);
+                            scanButton_Click("false", EventArgs.Empty);
                         stopTelemetriaButton.Visible = true;
                         scanButton.Visible = false;
                         telemetriaDistanceLabel.Text = "Distance: " + distanceString;
@@ -493,6 +492,8 @@ namespace FinalProject
         private void onFilesConfigurationsChanged(object sender, EventArgs e)
         {
             this.dataFilesPath = sender.ToString();
+            filesListView.Clear();
+            initializeFilesListView();
         }
 
         /*
@@ -521,30 +522,12 @@ namespace FinalProject
         {           
 
             this.maskedDistance = e.maskedDistance;
-            this.beamRange = e.beamRange;
+            this.beamRange = e.beamRange * 2;
 
             MDLabel.Text = "M.D.:" + maskedDistance;
 
             // Erase Lines
-            try
-            {
-                graphics = Graphics.FromImage(bmp);
-                Pen blackPen = new Pen(Color.Black, 2.5f);
-                for (int i = 0; i < linesArray.Length; i += 3)
-                {
-                    if (linesArray[i].IsEmpty)
-                        break;
-                    System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-us");
-                    graphics.DrawLine(blackPen, linesArray[i], linesArray[i + 1]);
-                    graphics.DrawLine(blackPen, linesArray[i + 1], linesArray[i + 2]);
-                }
-                blackPen.Dispose();
-                graphics.Dispose();
-                radarPictureBox.Image = bmp;
-
-            }
-            catch (Exception) { }
-
+            EraseLines();
 
             linesArray = new Point[3 * beamRange];
             redColorList = new Color[beamRange];
@@ -561,6 +544,29 @@ namespace FinalProject
             redColorList[beamRange - 1] = Color.Black;
         }
 
+        private void EraseLines()
+        {
+            try
+            {
+                graphics = Graphics.FromImage(bmp);
+                Pen blackPen = new Pen(Color.Black, 2.5f);
+                for (int i = 0; i < linesArray.Length; i += 3)
+                {
+                    if (linesArray[i].IsEmpty)
+                        break;
+                    graphics.DrawLine(blackPen, linesArray[i], linesArray[i + 1]);
+                    graphics.DrawLine(blackPen, linesArray[i + 1], linesArray[i + 2]);
+                }
+                blackPen.Dispose();
+                graphics.Dispose();
+                radarPictureBox.Image = bmp;
+                Array.Clear(linesArray, 0, linesArray.Length);
+                
+
+            }
+            catch (Exception) { Console.WriteLine("error erasing lines"); }
+        }
+
         /*
         * Listen to EnterKey to send data
         */
@@ -570,7 +576,7 @@ namespace FinalProject
             {
                 if (telemetriaDataTextBox.Focused) telemetriaButton_Click(sender, new EventArgs());
                 else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage1"])
-                    scanButton_Click(sender, new EventArgs());
+                    scanButton_Click("true", new EventArgs());
                 else if (tabControl1.SelectedTab == tabControl1.TabPages["tabPage2"])
                     sendFileButton_Click(sender, new EventArgs());
             }
@@ -718,7 +724,7 @@ namespace FinalProject
         /*
          * Scan Radar Button Click Listener
          */ 
-        private void scanButton_Click(object sender, EventArgs e)
+        private void scanButton_Click(object sendMessage, EventArgs e)
         {
             if(!serialPort.IsOpen)
             {
@@ -728,13 +734,18 @@ namespace FinalProject
             if (scanMode) // Stop scanning
             {
                 scanMode = false;
-                try
+                if (!sendMessage.Equals("false"))
                 {
-                    serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR, "");
-                    serialPort.clearMyBuffer();
-                    setConnectingLabel(CustomSerialPort.STATUS.OK);
+                    try
+                    {
+                        serialPort.sendMessage(CustomSerialPort.TYPE.STOP_RADAR, "");
+                        Thread.Sleep(100);
+                        serialPort.clearMyBuffer();
+                        setConnectingLabel(CustomSerialPort.STATUS.OK);
+                    }
+                    catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                 }
-                catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
+                EraseLines();
                 scanButton.Text = "Start Scan";
                 radarPictureBox.Visible = false;
                 radarTextPanel.Visible = false;
@@ -750,16 +761,19 @@ namespace FinalProject
                 telemetriaPanel.Visible = true;
                 telemetriaEnterAngleLabel.Visible = true;
                 radarPanel.BackColor = Color.Transparent;
-                t.Stop();
             }
             else // start scanning
             {
                 scanMode = true;
-                try
+                if (!sendMessage.Equals("false"))
                 {
-                    serialPort.sendMessage(CustomSerialPort.TYPE.SCAN, "");
+                    try
+                    {
+                        serialPort.sendMessage(CustomSerialPort.TYPE.SCAN, "");
+
+                    }
+                    catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                 }
-                catch (Exception) { setConnectingLabel(CustomSerialPort.STATUS.PORT_ERROR); }
                 scanButton.Text = "Stop Scan";
                 radarPictureBox.Visible = true;
                 radarTextPanel.Visible = true;
@@ -775,7 +789,6 @@ namespace FinalProject
                 telemetriaPanel.Visible = false;
                 telemetriaEnterAngleLabel.Visible = false;
                 radarPanel.BackColor = Color.Black;
-                t.Start();
             }
            
         }
@@ -800,7 +813,7 @@ namespace FinalProject
         {
             if (scriptNameTextBox.Text.Equals("") || scriptDataRichTextBox.Text.Equals(""))
                 return;
-            string path = Path.Combine(currentDirectoryPath, filesToSendDirectory, scriptNameTextBox.Text + ".txt");
+            string path = Path.Combine(dataFilesPath, scriptNameTextBox.Text + ".txt");
             string text = scriptDataRichTextBox.Text;
             text = text.Replace("\n","\r\n");
             File.WriteAllText(path, text);

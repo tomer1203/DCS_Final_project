@@ -53,4 +53,5 @@ StateModes enter();
 char* build_scan_msg(char* msg, int dis, int deg);
 StateModes rad_detect_sys();
 StateModes telemeter_system();
+void initialize_ui();
 #endif /* USER_INTERFACE_H_ */

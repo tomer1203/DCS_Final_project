@@ -7,7 +7,7 @@
 void InitServo(){
 	ClockSetupTPM(); // initialise tpm clock
 	InitTPMx(SERVO_TPM);		 // configure pit 0
-	StartTPMx(SERVO_TPM, 1); // start pit 
+	StartTPMx(SERVO_TPM, TRUE); // start pit 
 }
 /////////////////////////////////////
 //  Inits Sensors
@@ -28,19 +28,18 @@ void WriteServo(int deg){
 		return;
 	}
 	
-	StartTPMx(SERVO_TPM, 0);
+	StartTPMx(SERVO_TPM, FALSE);
 	dutyCycle = TPM_DC_VAL_MIN  + (TPM_DC_VAL_MAX - TPM_DC_VAL_MIN) * (float)deg/(float)SERVO_DEG_MAX ;
 	SetTPMxDutyCycle(SERVO_TPM, dutyCycle);
-	StartTPMx(SERVO_TPM, 1);
-	DelayMs(4*180/9);
+	StartTPMx(SERVO_TPM, TRUE);
+	DelayMs(100);
 
 }
 
 //////////////////////////////////////
-//	Sweep Servo 180 deg back & forth
+//	Sweep Servo 180 deg from 0 to 180
 //////////////////////////////////////
 void SweepServo(){
-	// TODO: work with PIT
 	
 	int deg;
 	for(deg=0 ; deg < 180 ; deg+=9)
