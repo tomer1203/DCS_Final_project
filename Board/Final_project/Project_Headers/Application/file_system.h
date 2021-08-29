@@ -9,7 +9,7 @@
 #define FILE_SYSTEM_H_
 
 #define SIZE_OF_FILE_SYSTEM 10000
-#define MAX_NUMBER_OF_FILES 20
+#define MAX_NUMBER_OF_FILES 3
 #define MAX_NAME_SIZE       20
 #define LINE_LENGTH         16
 #define FILE_SYSTEM_START_ADDRESS fs_memory

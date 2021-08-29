@@ -193,7 +193,7 @@ StateModes script_enter() {
 	command_p = &command;
 	arg1_p = &arg1;
 	arg2_p = &arg2;
-	read_commandline_init(file_select);
+	read_commandline_init(last_file_select);
 	
 	while (read_commandline(new_line)){
 		parse_command(command_p,arg1_p,arg2_p,new_line);

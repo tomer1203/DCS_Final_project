@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-#Progress monitor hint: 19
+#Progress monitor hint: 18
 first : all
 -include ../makefile.init
 
@@ -70,14 +70,14 @@ all: warning-messages explicit-dependencies Final_project.elf secondary-outputs
 # Tool invocations
 Final_project.elf: $(OBJS) $(USER_OBJS) ../Project_Settings/Linker_Files/MKL25Z128_flash.ld
 	@echo 'Building target: $@'
-	@echo 'Executing target #20 $@'
+	@echo 'Executing target #19 $@'
 	@echo 'Invoking: ARM Ltd Windows GCC C Linker'
 	"$(ARMSourceryDirEnv)/arm-none-eabi-gcc"  $(USER_OBJS_QUOTED) $(LIBS_QUOTED) @"Final_project.args" -o"Final_project.elf"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 Final_project.siz: Final_project.elf
-	@echo 'Executing target #21 $@'
+	@echo 'Executing target #20 $@'
 	@echo 'Invoking: ARM Ltd Windows GNU Print Size'
 	"$(ARMSourceryDirEnv)/arm-none-eabi-size"  --format=berkeley Final_project.elf
 	@echo 'Finished building: $@'

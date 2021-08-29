@@ -25,8 +25,6 @@
 #include "BoardSupport/BoardSupport.h"
 #include "BoardSupport/UART.h"
 #include "BoardSupport/Servo.h"
-#include "BoardSupport/ADCandDAC.h"
-
 
 #include "HardwareAbstraction/uart_functions.h"
 #include "HardwareAbstraction/script_functions.h"

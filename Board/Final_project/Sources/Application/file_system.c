@@ -233,6 +233,14 @@ int write_file_init_message(char* message){
 			file_system.first_file      = index_cyclic_plusplus(file_system.first_file);
 		}
 		
+		// if file system reached maximum descriptor capacity remove one descriptor
+		if (index_cyclic_plusplus(file_system.last_file) == file_system.first_file) {
+			file_system.file_list[file_system.first_file].valid = 0;
+			file_system.system_size_remaining += file_system.file_list[file_system.first_file].size;
+			file_system.number_of_files -= 1;
+			file_system.first_file = index_cyclic_plusplus(file_system.first_file);
+		}
+		
 		// add file to system
 		file_system.system_size_remaining -= size;
 		file_system.temp_file_desc.size = size;
