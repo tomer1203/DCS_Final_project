@@ -89,12 +89,13 @@ void InitTPMx(char x){  // x={0,1,2}
 	switch(x){ 
 	case 0: // Echo
 		TPM0_SC = 0; // to ensure that the counter is not running
-		TPM0_SC |= TPM_SC_PS(3); //Prescaler 8
+		TPM0_SC = TPM_SC_PS(5); //Prescaler 32
 		TPM0_MOD = 0xFFFF;
 		TPM0_C2SC = 0;
 		// Input capture both edge detect
 		TPM0_C2SC |= TPM_CnSC_ELSB_MASK + TPM_CnSC_ELSA_MASK + TPM_CnSC_CHIE_MASK;
 		TPM0_CONF = 0;
+		TPM0_C2V = 0;
 		enable_irq(INT_TPM0-16); // Enable Interrupts 
 		set_irq_priority (INT_TPM0-16,0);  // Interrupt priority = 0 = max
 		break;
@@ -170,6 +171,7 @@ void StartTPMx(char x, int start){
 }
 void clearTPM0(){
 	TPM0_CNT = 0;
+	TPM0_C2V = 0;
 }
 //-----------------------------------------------------------------
 // TPMx - Clock Setup

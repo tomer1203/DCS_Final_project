@@ -10,8 +10,8 @@
 // 1/2 KB
 #define MAX_STRING 524
 #define PACKET_SIZE 128
-#define DIST_AVG_SIZE 4
-#define LOG2_DIST_AVG_SIZE 2
+#define DIST_AVG_SIZE 8
+#define LOG2_DIST_AVG_SIZE 3
 char string_buffer[MAX_STRING];
 int string_index;
 int input_string_length;
@@ -22,15 +22,17 @@ int PitDelayDone;
 // distance array
 volatile unsigned int distances[DIST_AVG_SIZE];
 volatile int distance_index;
-volatile int last_value;
-volatile unsigned int acc_distance;
-volatile unsigned int out_distance;
-
+// bools
 extern volatile int distance_ready;
-unsigned int distance;
-extern volatile float rising_edge;
-extern volatile float falling_edge;
-extern volatile unsigned int signal_taken;	  
+extern volatile int signal_taken;	
+// distance variables
+extern volatile unsigned int acc_distance;
+extern volatile unsigned int out_distance;   
+
+extern volatile unsigned int distance;
+extern volatile unsigned int rising_edge;
+extern volatile unsigned int falling_edge;
+
 
 
 void DelayUs(unsigned int cnt);

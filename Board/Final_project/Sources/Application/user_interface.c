@@ -95,12 +95,12 @@ void       gen_print(){
 			        menu.submenu[get_next_line(line_select,menu.num_submenus)]->title);
 }
 char* build_scan_msg(char* msg, int dis, int deg){
-	char dis_ascii[16];
+	char dis_ascii[16] = {'\0'};
 	char Angle[4] = {0};
 	char Angle_padded[4] = {0};
 	
-	sprintf(dis_ascii,"%d",dis);
-	sprintf(Angle,"%d",deg);
+	sprintf(dis_ascii,"%d\0",dis);
+	sprintf(Angle,"%d\0",deg);
 	if (deg < 10){
 		strcpy(Angle_padded, "00");
 		strcat(Angle_padded,Angle);
@@ -131,17 +131,16 @@ StateModes rad_detect_sys(){
 		// Increase Servo's degree
 		degree += SERVO_DEG_CHANGE;
 		// Zeros degree when limit reached
-		if (degree >= SERVO_DEG_MAX){
+		if (degree > SERVO_DEG_MAX){
 			degree = SERVO_DEG_MIN;
 		}
 		
 		while(!distance_ready);
 		
-		if (distance_ready){
-			build_scan_msg(msg,out_distance,degree);
-			send2pc("Sc",msg);
-			distance_ready = FALSE;
-		}
+		build_scan_msg(msg,out_distance,degree);
+		send2pc("Sc",msg);
+		distance_ready = FALSE;
+			
 		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
@@ -156,23 +155,25 @@ StateModes rad_detect_sys(){
 //   Telemetry
 ///////////////////////
 StateModes telemeter_system(){
-	char str[16];
+	char str[16] = {'\0'};
 	enterON = FALSE;
 	enable_sensor(TRUE);
 	Print("Telemetry");
 	while(1){
-		if (distance_ready){
-			sprintf(str,"%d",out_distance);
-			send2pc("Te",str);
-			distance_ready = FALSE;
-		}
+		// wait until distance ready
+		while(!distance_ready);
+		
+		sprintf(str,"%d\0",out_distance);
+		send2pc("Te",str);
+		distance_ready = FALSE;
+	
 		if (enterON || stopRadar){
 			enterON = FALSE;
 			enable_sensor(FALSE);
 			Print_two_lines("Telemetry","Stopped");
 			return state;
 		}
-		WaitDelay(50);
+		WaitDelay(SCAN_DELAY*2);
 	}
 }
 void parse_command(int* command_p, int* arg1_p, int* arg2_p, char* command_line){

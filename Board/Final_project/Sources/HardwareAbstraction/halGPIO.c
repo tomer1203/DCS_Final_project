@@ -82,12 +82,13 @@ void PIT_IRQHandler(){
 //  Ultra-sonic sensor Echo  - ISR
 //-----------------------------------------------------------------
 void FTM0_IRQHandler(){
+	unsigned int last_value;
 	GREEN_LED_TOGGLE;
-	if (signal_taken == FALSE){    // Capture Rising Edge 
+	if (!signal_taken){    // Capture Rising Edge 
 		rising_edge = TPM0_C2V;    // Time of rising edge in Echo pulse
 		signal_taken = TRUE;
 	}
-	else{						   // Capture Falling Edge 
+	else if (signal_taken){						   // Capture Falling Edge 
 		falling_edge = TPM0_C2V;   
 		signal_taken = FALSE;
 		if(falling_edge < rising_edge)
@@ -99,11 +100,11 @@ void FTM0_IRQHandler(){
 		if (distance_index == DIST_AVG_SIZE){
 			distance_index = 0;
 		}
-		
+		// calc average distance
 		acc_distance += (distance - last_value);
 		out_distance = acc_distance >> LOG2_DIST_AVG_SIZE;
 
-		
+		// enable send to pc
 		distance_ready = TRUE;
 		clearTPM0();
 	}
@@ -119,7 +120,8 @@ void ResetDistanceAccumulator(){
 	while (distance_index < DIST_AVG_SIZE){
 		distances[distance_index++] = 0;
 	}
-	distance_index = distance = last_value = acc_distance = 0;
+	distance_index = distance = acc_distance = 0;
+	signal_taken = FALSE;
 	enable_sensor(TRUE);
 }
 

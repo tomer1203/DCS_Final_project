@@ -330,10 +330,10 @@ namespace FinalProject
                     });
                     break;
 
-                // Recieve Telemetria info
+                // Recieve Telemetry info
                 case CustomSerialPort.TYPE.TELMETERIA:
-                    string distanceString = calcDistsnce(float.Parse(val)) > maskedDistance ?
-                        "Out of Range" : calcDistsnce(float.Parse(val)).ToString("#.##") + " cm";
+                    string distanceString = calcDistsnce(int.Parse(val)) > maskedDistance ?
+                        "Out of Range" : calcDistsnce(int.Parse(val)).ToString("#.##") + " cm";
                     Console.WriteLine("Telemetria: Distance- " + distanceString);
                     updateFileTransferStatusLabel("");
                     this.Invoke((MethodInvoker)delegate
@@ -384,13 +384,15 @@ namespace FinalProject
         /*
          * Calculates distance from TPM register diff
          */ 
-        private float calcDistsnce(float tpmDiff)
+        private float calcDistsnce(int tpmDiff)
         {
-            // time diff: 1 / (24M/8)  | 24MHz = tpm clk , 8 = tpm prescaler
-
-            // float tpmTimeDiff = (float)tpmDiff / (float) 3000000; 
-            // float dist = tpmTimeDiff * 17000;
-            return (float)tpmDiff / (float)176.4705882;
+            // final clk: 1 / (tpm clk/prescaler)  | tpm clk = 24MHz  , tpm prescaler = 32 
+            // => final clk = 24M/32 = 750,000 Hz
+            // dist = tpmDiff * (17,150 / final clk); 
+            // prescaler = 8 : 176.4705882352941
+            // prescaler = 32 : 43.731778425655976676384839650146
+            //return (float)(tpmDiff * 0.022866666666);
+            return (float)tpmDiff / (float)43.731778425655976676384839650146;
         } 
 
         /*

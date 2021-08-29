@@ -21,6 +21,10 @@ int is_name_command(char* string);
 char* strip_command(char* string);
 void change_Baud_config(int Baud_rate);
 
+int is_stopRadar_command(char* string);
+int is_scan_command(char* string);
+int is_telemeter_command(char* string);
+
 int validate_checksum(char* string, int len);
 char calc_checksum(char * string,int len);
 void send2pc(char* code,const char* message);

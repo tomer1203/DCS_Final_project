@@ -4,12 +4,16 @@
  */
 
 # include "TFC.h"
-  
-volatile int distance_ready = 0;
-unsigned int distance;
-volatile float rising_edge = 0;
-volatile float falling_edge = 0;
-volatile unsigned int signal_taken = 0;	  
+
+// Declarations of externs
+volatile int distance_ready = FALSE;
+volatile int signal_taken = FALSE;	
+volatile unsigned int acc_distance = 0;
+volatile unsigned int out_distance = 0;
+volatile unsigned int distance = 0;
+volatile unsigned int rising_edge = 0;
+volatile unsigned int falling_edge = 0;
+
 
 int main(void){
 	
