@@ -88,7 +88,7 @@ void FTM0_IRQHandler(){
 		rising_edge = TPM0_C2V;    // Time of rising edge in Echo pulse
 		signal_taken = TRUE;
 	}
-	else if (signal_taken){						   // Capture Falling Edge 
+	else if (signal_taken){		   // Capture Falling Edge 
 		falling_edge = TPM0_C2V;   
 		signal_taken = FALSE;
 		if(falling_edge < rising_edge)

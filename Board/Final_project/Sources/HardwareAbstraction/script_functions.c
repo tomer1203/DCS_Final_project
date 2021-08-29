@@ -73,11 +73,14 @@ void clear_all_leds(){
 // 06
 void servo_deg(int degree){
 	char msg[20] = {0};
+	int i = 0;
 	WriteServo(degree);
 	enable_sensor(TRUE);
-	while(!distance_ready){
-		WaitDelay(10);
+	for(i = 0 ; i < DIST_AVG_SIZE + 1; i++){
+		distance_ready = FALSE;
+		while(!distance_ready);
 	}
+	
 	if (distance_ready){
 		build_scan_msg(msg,out_distance,degree);
 		send2pc("Sc",msg);
