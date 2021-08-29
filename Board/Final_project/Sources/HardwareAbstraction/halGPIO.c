@@ -83,7 +83,6 @@ void PIT_IRQHandler(){
 //-----------------------------------------------------------------
 void FTM0_IRQHandler(){
 	GREEN_LED_TOGGLE;
-	int last_value;
 	if (signal_taken == FALSE){    // Capture Rising Edge 
 		rising_edge = TPM0_C2V;    // Time of rising edge in Echo pulse
 		signal_taken = TRUE;
@@ -100,14 +99,28 @@ void FTM0_IRQHandler(){
 		if (distance_index == DIST_AVG_SIZE){
 			distance_index = 0;
 		}
+		
 		acc_distance += (distance - last_value);
 		out_distance = acc_distance >> LOG2_DIST_AVG_SIZE;
+
 		
 		distance_ready = TRUE;
-		//StartTPMx(0, FALSE);
 		clearTPM0();
 	}
 	TPM0_C2SC |= TPM_CnSC_CHF_MASK; //Manual flag down of the timer
+}
+
+//////////////////////////////////
+// Reset Distance Accumulator
+//////////////////////////////////
+void ResetDistanceAccumulator(){
+	enable_sensor(FALSE);
+	distance_index = 0;
+	while (distance_index < DIST_AVG_SIZE){
+		distances[distance_index++] = 0;
+	}
+	distance_index = distance = last_value = acc_distance = 0;
+	enable_sensor(TRUE);
 }
 
 
@@ -197,25 +210,29 @@ void handleMessage(){
 		
 	default:
 		// ACTIONS //
+		// Stop Radar (telemetry & scan)
 		if (is_stopRadar_command(string_buffer)){
 			stopRadar = TRUE;
 		}
+		// Start Scan
 		else if (is_scan_command(string_buffer)) {
 			activateScan = TRUE;
 		}
+		// Start Telemetry
 		else if (is_telemeter_command(string_buffer)) {
 			WriteServo(atoi(strip_command(string_buffer)));
+			ResetDistanceAccumulator();
 			activateTelemeter = TRUE;
 		}
-		// print message to chat
+		// Print message to chat
 		else if (is_chat_command(string_buffer)) {
 			Print(strip_command(string_buffer));
 		}
-		// receiving a file
+		// Receiving a file
 		else if (is_write_file_transfer_command(string_buffer)) {
 			state = WRITING_FILE_INIT_E;
 		}
-		// change Baud rate
+		// Change Baud rate
 		else if (is_br_command(string_buffer)) {
 			changeBaudrate();
 		}

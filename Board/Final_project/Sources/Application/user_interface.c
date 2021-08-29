@@ -63,7 +63,7 @@ StateModes enter(){
 	StateModes next_state = menu.enter_callback();
 	return next_state;
 	
-} // END enter
+} 
 
 /////////////////////////////////
 //		CALLBACK FUNCTIONS!
@@ -114,6 +114,9 @@ char* build_scan_msg(char* msg, int dis, int deg){
 	strcat(msg,dis_ascii);
 	return msg;
 }
+//////////////////////////////
+//           Scan
+//////////////////////////////
 StateModes rad_detect_sys(){
 	int degree = 0;
 	char msg[20] = {0};
@@ -122,11 +125,16 @@ StateModes rad_detect_sys(){
 	Print("Scanning");
 	while (1){
 		WriteServo(degree);
-		//enable_sensor(TRUE);
+		if(degree == SERVO_DEG_MIN){
+			ResetDistanceAccumulator();
+		}
+		// Increase Servo's degree
 		degree += SERVO_DEG_CHANGE;
-		if (degree > SERVO_DEG_MAX){
+		// Zeros degree when limit reached
+		if (degree >= SERVO_DEG_MAX){
 			degree = SERVO_DEG_MIN;
 		}
+		
 		while(!distance_ready);
 		
 		if (distance_ready){
@@ -140,10 +148,13 @@ StateModes rad_detect_sys(){
 			Print_two_lines("Scan","Stopped");
 			return state;
 		}
-		//enable_sensor(FALSE);
+		
 		WaitDelay(SCAN_DELAY);
 	}
 }
+////////////////////////
+//   Telemetry
+///////////////////////
 StateModes telemeter_system(){
 	char str[16];
 	enterON = FALSE;
@@ -182,6 +193,9 @@ void parse_command(int* command_p, int* arg1_p, int* arg2_p, char* command_line)
 	Temp[1] = command_line[5];
 	*arg2_p = (int)strtol(Temp, NULL, 16);
 }
+/////////////////////////
+//    Script Enter
+/////////////////////////
 StateModes script_enter() {
 	char  new_line[10];
 	int command,arg1,arg2;
@@ -210,6 +224,9 @@ StateModes script_enter() {
 	}
 	return SCRIPT_E;
 }
+//////////////////////////
+//   Script Scroll
+/////////////////////////
 void script_scroll(){
 	if (line_select != menu.num_submenus-1) {
 		last_file_select = file_select;
@@ -219,6 +236,9 @@ void script_scroll(){
 	}
 	line_select = get_next_line(line_select, menu.num_submenus);
 }
+//////////////////////////
+//    Script Print
+/////////////////////////
 void script_print() {
 	if (line_select == 0) {
 		Print_two_lines(back, current_file_desc->name);
@@ -229,6 +249,9 @@ void script_print() {
 	else
 		Print_two_lines(last_file_descriptor->name,current_file_desc->name);
 }
+//////////////////////////
+//   Init Scroll
+/////////////////////////
 void init_script(){
 	file_select = file_system.first_file;
 	line_select = 0;
@@ -239,9 +262,6 @@ void init_script(){
 	}
 	current_file_desc = file_info(file_select);
 }
-////////////////////////////////
-//		Actions
-////////////////////////////////
 
 /////////////////////////////////
 //		Get Next Line

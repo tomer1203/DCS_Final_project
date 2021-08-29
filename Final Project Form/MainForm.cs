@@ -806,6 +806,7 @@ namespace FinalProject
                 telemetriaLabel.Visible = false;
                 telemetriaPanel.Visible = false;
                 telemetriaEnterAngleLabel.Visible = false;
+                stopTelemetriaButton.Visible = false;
                 radarPanel.BackColor = Color.Black;
             }
            

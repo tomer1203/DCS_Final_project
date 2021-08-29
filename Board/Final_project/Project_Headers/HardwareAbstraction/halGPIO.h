@@ -10,8 +10,8 @@
 // 1/2 KB
 #define MAX_STRING 524
 #define PACKET_SIZE 128
-#define DIST_AVG_SIZE 8
-#define LOG2_DIST_AVG_SIZE 3
+#define DIST_AVG_SIZE 4
+#define LOG2_DIST_AVG_SIZE 2
 char string_buffer[MAX_STRING];
 int string_index;
 int input_string_length;
@@ -20,12 +20,13 @@ int baud_config;
 int PitDelayDone;
 
 // distance array
-unsigned int distances[DIST_AVG_SIZE];
-int distance_index;
-unsigned int acc_distance;
-unsigned int out_distance;
+volatile unsigned int distances[DIST_AVG_SIZE];
+volatile int distance_index;
+volatile int last_value;
+volatile unsigned int acc_distance;
+volatile unsigned int out_distance;
 
-extern int distance_ready;
+extern volatile int distance_ready;
 unsigned int distance;
 extern volatile float rising_edge;
 extern volatile float falling_edge;
@@ -43,5 +44,6 @@ void Print(const char * s);
 void changeBaudrate();
 void handleMessage();
 void init_hal();
+void ResetDistanceAccumulator();
 
 #endif /* HALGPIO_H_ */
